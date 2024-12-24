@@ -5,10 +5,14 @@ async function runCypress() {
   const args = ['run', '--browser', 'chrome', '--headless'];
 
   if (process.env.CYPRESS_BAIL === 'true') {
-    args.push('--bail');
+    args.push('--exit-on-first-failure');
   }
 
   const specs = await globby(['cypress/e2e/*spec*.js']);
+  if (specs.length === 0) {
+    console.log('No test files found in cypress/e2e/*spec*.js');
+    process.exit(1);
+  }
 
   if (process.env.IS_FORK === 'true') {
     const machineIndex = parseInt(process.env.MACHINE_INDEX);
@@ -34,6 +38,7 @@ async function runCypress() {
     );
   }
 
+  console.log('Running Cypress with args:', args.join(' '));
   await execa('cypress', args, { stdio: 'inherit', preferLocal: true });
 }
 
