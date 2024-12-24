@@ -4,10 +4,6 @@ import { globby } from 'globby';
 async function runCypress() {
   const args = ['run', '--browser', 'chrome', '--headless'];
 
-  if (process.env.CYPRESS_BAIL === 'true') {
-    args.push('--exit-on-first-failure');
-  }
-
   const specs = await globby(['cypress/e2e/*spec*.js']);
   if (specs.length === 0) {
     console.log('No test files found in cypress/e2e/*spec*.js');
