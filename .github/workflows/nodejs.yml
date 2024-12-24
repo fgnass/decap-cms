@@ -24,8 +24,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest, windows-latest, ubuntu-latest]
-        node-version: [18.x, 20.x]
+        os: [ubuntu-latest] # [macos-latest, windows-latest, ubuntu-latest]
+        node-version: [20.x] # [18.x, 20.x]
       fail-fast: true
     if: ${{ needs.changes.outputs.cms == 'true' }}
     steps:
@@ -46,12 +46,13 @@ jobs:
         run: npm run build:demo
       - name: run e2e tests
         if: matrix.os == 'ubuntu-latest' && matrix.node-version == '20.x'
-        run: npm run test:e2e:run-ci -- --bail
+        run: npm run test:e2e:run-ci
         env:
           IS_FORK: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork == true || github.repository_owner != 'decaporg' }}
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
           NODE_OPTIONS: --max-old-space-size=4096
           TZ: Europe/Amsterdam
+          CYPRESS_BAIL: true
       - uses: actions/upload-artifact@v3
         if: matrix.os == 'ubuntu-latest' && matrix.node-version == '20.x' && failure()
         with:

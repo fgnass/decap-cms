@@ -2,6 +2,12 @@ import execa from 'execa';
 import { globby } from 'globby';
 
 async function runCypress() {
+  const args = ['run', '--browser', 'chrome', '--headless'];
+
+  if (process.env.CYPRESS_BAIL === 'true') {
+    args.push('--bail');
+  }
+
   if (process.env.IS_FORK === 'true') {
     const machineIndex = parseInt(process.env.MACHINE_INDEX);
     const machineCount = parseInt(process.env.MACHINE_COUNT);
@@ -13,29 +19,18 @@ async function runCypress() {
         ? specs.slice(start)
         : specs.slice(start, start + specsPerMachine);
 
-    await execa(
-      'cypress',
-      ['run', '--browser', 'chrome', '--headless', '--bail', '--spec', machineSpecs.join(',')],
-      { stdio: 'inherit', preferLocal: true },
-    );
+    args.push('--spec', machineSpecs.join(','));
+    await execa('cypress', args, { stdio: 'inherit', preferLocal: true });
   } else {
-    await execa(
-      'cypress',
-      [
-        'run',
-        '--browser',
-        'chrome',
-        '--headless',
-        '--bail',
-        '--record',
-        '--parallel',
-        '--ci-build-id',
-        process.env.GITHUB_SHA,
-        '--group',
-        'GitHub CI',
-      ],
-      { stdio: 'inherit', preferLocal: true },
+    args.push(
+      '--record',
+      '--parallel',
+      '--ci-build-id',
+      process.env.GITHUB_SHA,
+      '--group',
+      'GitHub CI',
     );
+    await execa('cypress', args, { stdio: 'inherit', preferLocal: true });
   }
 }
 
