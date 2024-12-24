@@ -8,10 +8,11 @@ async function runCypress() {
     args.push('--bail');
   }
 
+  const specs = await globby(['cypress/e2e/*spec*.js']);
+
   if (process.env.IS_FORK === 'true') {
     const machineIndex = parseInt(process.env.MACHINE_INDEX);
     const machineCount = parseInt(process.env.MACHINE_COUNT);
-    const specs = await globby(['cypress/integration/*spec*.js']);
     const specsPerMachine = Math.floor(specs.length / machineCount);
     const start = (machineIndex - 1) * specsPerMachine;
     const machineSpecs =
@@ -20,7 +21,6 @@ async function runCypress() {
         : specs.slice(start, start + specsPerMachine);
 
     args.push('--spec', machineSpecs.join(','));
-    await execa('cypress', args, { stdio: 'inherit', preferLocal: true });
   } else {
     args.push(
       '--record',
@@ -29,9 +29,12 @@ async function runCypress() {
       process.env.GITHUB_SHA,
       '--group',
       'GitHub CI',
+      '--spec',
+      specs.join(','),
     );
-    await execa('cypress', args, { stdio: 'inherit', preferLocal: true });
   }
+
+  await execa('cypress', args, { stdio: 'inherit', preferLocal: true });
 }
 
 runCypress();
