@@ -93,6 +93,7 @@ export class PreviewPane extends React.Component {
     if (field.get('meta')) {
       value = this.props.entry.getIn(['meta', field.get('name')]);
     }
+
     const nestedFields = field.get('fields');
     const singleField = field.get('field');
     const metadata = fieldsMetaData && fieldsMetaData.get(field.get('name'), Map());
@@ -230,12 +231,15 @@ export class PreviewPane extends React.Component {
     const visualEditing = collection.getIn(['editor', 'visualEditing'], false);
 
     // Only encode entry data if visual editing is enabled
-    const previewEntry = visualEditing ? entry.set('data', encodeEntry(entry.get('data'))) : entry;
+    const previewEntry = visualEditing
+      ? entry.set('data', encodeEntry(entry.get('data'), this.props.fields))
+      : entry;
 
     const previewProps = {
       ...this.props,
       entry: previewEntry,
-      widgetFor: this.widgetFor,
+      widgetFor: (name, fields, values = previewEntry.get('data'), fieldsMetaData) =>
+        this.widgetFor(name, fields, values, fieldsMetaData),
       widgetsFor: this.widgetsFor,
       getCollection: this.getCollection,
     };
