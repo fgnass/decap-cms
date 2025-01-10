@@ -381,7 +381,7 @@ class EditorInterface extends Component {
                 title={t('editor.editorInterface.togglePreview')}
               />
             )}
-            {scrollSyncVisible && (
+            {scrollSyncVisible && !collection.getIn(['editor', 'visualEditing']) && (
               <EditorToggle
                 isActive={scrollSyncEnabled}
                 onClick={this.handleToggleScrollSync}

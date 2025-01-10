@@ -6,6 +6,7 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import Frame, { FrameContextConsumer } from 'react-frame-component';
 import { lengths } from 'decap-cms-ui-default';
 import { connect } from 'react-redux';
+import { encodeEntry } from 'decap-cms-lib-util/src/stega';
 
 import {
   resolveWidget,
@@ -226,8 +227,14 @@ export class PreviewPane extends React.Component {
 
     this.inferFields();
 
+    const visualEditing = collection.getIn(['editor', 'visualEditing'], false);
+
+    // Only encode entry data if visual editing is enabled
+    const previewEntry = visualEditing ? entry.set('data', encodeEntry(entry.get('data'))) : entry;
+
     const previewProps = {
       ...this.props,
+      entry: previewEntry,
       widgetFor: this.widgetFor,
       widgetsFor: this.widgetsFor,
       getCollection: this.getCollection,
