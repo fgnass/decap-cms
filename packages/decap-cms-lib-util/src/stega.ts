@@ -1,55 +1,126 @@
-import { Map as ImmutableMap, List } from 'immutable';
 import { vercelStegaEncode } from '@vercel/stega';
 
-function isList(value: unknown): value is List<unknown> {
-  return List.isList(value);
-}
+import { isListField, isObjectField, isImmutableMap, isImmutableList } from './types';
 
-function isMap(value: unknown): value is ImmutableMap<unknown, unknown> {
-  return ImmutableMap.isMap(value);
+import type { Map as ImmutableMap, List } from 'immutable';
+import type { CmsField } from 'decap-cms-core';
+
+/**
+ * Context passed to encode functions, containing the current state of the encoding process
+ */
+interface EncodeContext {
+  fields: CmsField[]; // Available CMS fields at current level
+  path: string; // Path to current value in object tree
+  visit: (value: unknown, fields: CmsField[], path: string) => unknown; // Visitor for recursive traversal
 }
 
 /**
- * Traverses an immutable data structure and encodes string values with stega.
- * Uses identity checks to minimize updates.
+ * Get the fields that should be used for encoding nested values
  */
-export function encodeEntry(value: unknown, path = '') {
-  const previousData = new Map<string, unknown>();
-  const cache = new Map<string, unknown>();
+function getNestedFields(field?: CmsField): CmsField[] {
+  if (!field) return [];
+  if (isListField(field)) {
+    // For list fields, use either the types array or the single field definition
+    if ('types' in field && field.types) return field.types;
+    if ('field' in field && field.field) return [field.field];
+  }
+  if (isObjectField(field) && 'fields' in field && field.fields) {
+    // For object fields, use the fields array
+    return field.fields;
+  }
+  return [];
+}
 
-  function visit(value: unknown, path = ''): unknown {
-    const prevValue = previousData.get(path);
-    if (value === prevValue) {
-      return cache.get(path) ?? value;
+/**
+ * Encode a string value by appending steganographic data
+ * For markdown fields, encode each paragraph separately
+ */
+function encodeString(value: string, { fields, path }: EncodeContext): string {
+  const field = path.split('.').pop() || '';
+  const stega = vercelStegaEncode({ decap: field });
+  const isMarkdown = fields[0]?.widget === 'markdown';
+
+  if (isMarkdown && value.includes('\n\n')) {
+    const blocks = value.split(/(\n\n+)/);
+    return blocks.map(block => (block.trim() ? block + stega : block)).join('');
+  }
+  return value + stega;
+}
+
+/**
+ * Encode a list of values, handling both simple values and nested objects/lists
+ * For typed lists, use the type field to determine which fields to use
+ */
+function encodeList(list: List<unknown>, ctx: EncodeContext): List<unknown> {
+  let newList = list;
+  for (let i = 0; i < newList.size; i++) {
+    const item = newList.get(i);
+    if (isImmutableMap(item)) {
+      const itemType = item.get('type');
+      if (typeof itemType === 'string') {
+        // For typed items, look up fields based on type
+        const field = ctx.fields.find(f => f.name === itemType);
+        const newItem = ctx.visit(item, getNestedFields(field), `${ctx.path}.${i}`);
+        newList = newList.set(i, newItem);
+      } else {
+        // For untyped items, use current fields
+        const newItem = ctx.visit(item, ctx.fields, `${ctx.path}.${i}`);
+        newList = newList.set(i, newItem);
+      }
+    } else {
+      // For simple values, use first field if available
+      const field = ctx.fields[0];
+      const newItem = ctx.visit(item, field ? [field] : [], `${ctx.path}.${i}`);
+      if (newItem !== item) {
+        newList = newList.set(i, newItem);
+      }
     }
-    previousData.set(path, value);
+  }
+  return newList;
+}
 
+/**
+ * Encode a map of values, looking up the appropriate field for each key
+ * and recursively encoding nested values
+ */
+function encodeMap(
+  map: ImmutableMap<string, unknown>,
+  ctx: EncodeContext,
+): ImmutableMap<string, unknown> {
+  let newMap = map;
+  for (const [key, val] of newMap.entrySeq().toArray()) {
+    const field = ctx.fields.find(f => f.name === key);
+    if (field) {
+      const fieldList = getNestedFields(field);
+      const newVal = ctx.visit(val, fieldList.length ? fieldList : [field], `${ctx.path}.${key}`);
+      if (newVal !== val) {
+        newMap = newMap.set(key, newVal);
+      }
+    }
+  }
+  return newMap;
+}
+
+/**
+ * Main entry point for encoding steganographic data into entry values
+ * Uses a visitor pattern with caching to handle recursive structures
+ */
+export function encodeEntry(value: unknown, fields: List<ImmutableMap<string, unknown>>) {
+  const plainFields = fields.toJS() as CmsField[];
+  const cache = new Map();
+
+  function visit(value: unknown, fields: CmsField[], path = '') {
+    const cached = cache.get(path);
+    if (cached === value) return value;
+
+    const ctx: EncodeContext = { fields, path, visit };
     let result;
-    if (isList(value)) {
-      let newList = value;
-      for (let i = 0; i < newList.size; i++) {
-        const item = newList.get(i);
-        const newItem = visit(item, `${path}.${i}`);
-        if (newItem !== item) {
-          newList = newList.set(i, newItem);
-        }
-      }
-      result = newList;
-    } else if (isMap(value)) {
-      let newMap = value;
-      for (const [key, val] of newMap.entrySeq().toArray()) {
-        const newVal = visit(val, `${path}.${key}`);
-        if (newVal !== val) {
-          newMap = newMap.set(key, newVal);
-        }
-      }
-      result = newMap;
+    if (isImmutableList(value)) {
+      result = encodeList(value, ctx);
+    } else if (isImmutableMap(value)) {
+      result = encodeMap(value, ctx);
     } else if (typeof value === 'string') {
-      // Extract field name from path for stega metadata
-      const field = path.split('.').pop() || '';
-      const stega = vercelStegaEncode({ decap: field });
-      result = value + stega;
-      console.log('Encoded value:', result);
+      result = encodeString(value, ctx);
     } else {
       result = value;
     }
@@ -58,5 +129,5 @@ export function encodeEntry(value: unknown, path = '') {
     return result;
   }
 
-  return visit(value, path);
+  return visit(value, plainFields);
 }
