@@ -271,6 +271,7 @@ export class PreviewPane extends React.Component {
               return (
                 <EditorPreviewContent
                   {...{ previewComponent, previewProps: { ...previewProps, document, window } }}
+                  onFieldClick={this.props.onFieldClick}
                 />
               );
             }}
@@ -287,6 +288,7 @@ PreviewPane.propTypes = {
   entry: ImmutablePropTypes.map.isRequired,
   fieldsMetaData: ImmutablePropTypes.map.isRequired,
   getAsset: PropTypes.func.isRequired,
+  onFieldClick: PropTypes.func,
 };
 
 function mapStateToProps(state) {

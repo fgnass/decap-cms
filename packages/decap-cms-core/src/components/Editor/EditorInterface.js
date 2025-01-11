@@ -162,6 +162,11 @@ class EditorInterface extends Component {
     i18nVisible: localStorage.getItem(I18N_VISIBLE) !== 'false',
   };
 
+  handleFieldClick = path => {
+    console.log('Field clicked:', path);
+    // We'll implement the field traversal logic here in the next step
+  };
+
   handleSplitPaneDragStart = () => {
     this.setState({ showEventBlocker: true });
   };
@@ -298,6 +303,7 @@ class EditorInterface extends Component {
                 fields={fields}
                 fieldsMetaData={fieldsMetaData}
                 locale={leftPanelLocale}
+                onFieldClick={this.handleFieldClick}
               />
             </PreviewPaneContainer>
           </StyledSplitPane>

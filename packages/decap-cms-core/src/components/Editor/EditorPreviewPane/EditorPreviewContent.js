@@ -11,12 +11,8 @@ import { vercelStegaDecode } from '@vercel/stega';
  */
 class PreviewContent extends React.Component {
   handleClick = e => {
-    const { previewProps } = this.props;
+    const { previewProps, onFieldClick } = this.props;
     const visualEditing = previewProps?.collection?.getIn(['editor', 'visualEditing'], false);
-    console.log('Click event:', {
-      target: e.target,
-      visualEditing,
-    });
 
     if (!visualEditing) {
       return;
@@ -24,11 +20,11 @@ class PreviewContent extends React.Component {
 
     try {
       const text = e.target.textContent;
-      console.log('Clicked text:', text);
       const decoded = vercelStegaDecode(text);
-      console.log('Decoded data:', decoded);
       if (decoded?.decap) {
-        console.log('Clicked field:', decoded.decap);
+        if (onFieldClick) {
+          onFieldClick(decoded.decap);
+        }
       }
     } catch (err) {
       console.log('Error extracting stega data:', {
@@ -75,6 +71,7 @@ class PreviewContent extends React.Component {
 PreviewContent.propTypes = {
   previewComponent: PropTypes.func.isRequired,
   previewProps: PropTypes.object,
+  onFieldClick: PropTypes.func,
 };
 
 export default PreviewContent;
