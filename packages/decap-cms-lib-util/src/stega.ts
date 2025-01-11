@@ -1,6 +1,6 @@
 import { vercelStegaEncode } from '@vercel/stega';
 
-import { isListField, isObjectField, isImmutableMap, isImmutableList } from './types';
+import { isImmutableMap, isImmutableList } from './types';
 
 import type { Map as ImmutableMap, List } from 'immutable';
 import type { CmsField } from 'decap-cms-core';
@@ -17,16 +17,17 @@ interface EncodeContext {
 /**
  * Get the fields that should be used for encoding nested values
  */
-function getNestedFields(field?: CmsField): CmsField[] {
-  if (!field) return [];
-  if (isListField(field)) {
-    // For list fields, use either the types array or the single field definition
-    if ('types' in field && field.types) return field.types;
-    if ('field' in field && field.field) return [field.field];
-  }
-  if (isObjectField(field) && 'fields' in field && field.fields) {
-    // For object fields, use the fields array
-    return field.fields;
+function getNestedFields(f?: CmsField): CmsField[] {
+  if (f) {
+    if ('types' in f) {
+      return f.types ?? [];
+    }
+    if ('fields' in f) {
+      return f.fields ?? [];
+    }
+    if ('field' in f) {
+      return f.field ? [f.field] : [];
+    }
   }
   return [];
 }
@@ -36,8 +37,7 @@ function getNestedFields(field?: CmsField): CmsField[] {
  * For markdown fields, encode each paragraph separately
  */
 function encodeString(value: string, { fields, path }: EncodeContext): string {
-  const field = path.split('.').pop() || '';
-  const stega = vercelStegaEncode({ decap: field });
+  const stega = vercelStegaEncode({ decap: path });
   const isMarkdown = fields[0]?.widget === 'markdown';
 
   if (isMarkdown && value.includes('\n\n')) {
@@ -91,8 +91,8 @@ function encodeMap(
   for (const [key, val] of newMap.entrySeq().toArray()) {
     const field = ctx.fields.find(f => f.name === key);
     if (field) {
-      const fieldList = getNestedFields(field);
-      const newVal = ctx.visit(val, fieldList.length ? fieldList : [field], `${ctx.path}.${key}`);
+      const fields = getNestedFields(field);
+      const newVal = ctx.visit(val, fields, ctx.path ? `${ctx.path}.${key}` : key);
       if (newVal !== val) {
         newMap = newMap.set(key, newVal);
       }
