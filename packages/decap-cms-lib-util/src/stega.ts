@@ -28,6 +28,7 @@ function getNestedFields(f?: CmsField): CmsField[] {
     if ('field' in f) {
       return f.field ? [f.field] : [];
     }
+    return [f];
   }
   return [];
 }
