@@ -163,8 +163,7 @@ class EditorInterface extends Component {
   };
 
   handleFieldClick = path => {
-    console.log('Field clicked:', path);
-    // We'll implement the field traversal logic here in the next step
+    this.controlPaneRef?.focus(path);
   };
 
   handleSplitPaneDragStart = () => {

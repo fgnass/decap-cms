@@ -595,6 +595,16 @@ export default class ListControl extends React.Component {
     }
   };
 
+  focus(path) {
+    const [index, ...remainingPath] = path.split('.');
+    const key = this.state.keys[index];
+    const control = this.childRefs[key];
+    console.log('ListControl.focus', index, key, control);
+    if (control?.focus) {
+      control.focus(remainingPath.join('.'));
+    }
+  }
+
   // eslint-disable-next-line react/display-name
   renderItem = (item, index) => {
     const {

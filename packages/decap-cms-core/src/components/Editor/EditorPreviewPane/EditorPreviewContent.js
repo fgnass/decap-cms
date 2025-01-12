@@ -27,10 +27,7 @@ class PreviewContent extends React.Component {
         }
       }
     } catch (err) {
-      console.log('Error extracting stega data:', {
-        error: err.message,
-        text: e.target.textContent,
-      });
+      console.log('Visual editing error:', err);
     }
   };
 

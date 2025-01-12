@@ -171,6 +171,15 @@ export default class ControlPane extends React.Component {
     }
   };
 
+  focus(path) {
+    const [fieldName, ...remainingPath] = path.split('.');
+    const control = this.childRefs[fieldName];
+    console.log('ControlPane.focus', fieldName, remainingPath, control);
+    if (control?.focus) {
+      control.focus(remainingPath.join('.'));
+    }
+  }
+
   render() {
     const { collection, entry, fields, fieldsMetaData, fieldsErrors, onChange, onValidate, t } =
       this.props;
