@@ -120,7 +120,6 @@ export default class Widget extends Component {
   };
 
   focus(path) {
-    console.log('Widget.focus', path, this.innerWrappedControl);
     // Try widget's custom focus method first
     if (this.innerWrappedControl?.focus) {
       this.innerWrappedControl.focus(path);
@@ -129,11 +128,13 @@ export default class Widget extends Component {
 
     // Fall back to focusing by ID for simple widgets
     const element = document.getElementById(this.props.uniqueFieldId);
-    console.log('Widget.focus', this.props.uniqueFieldId, element);
     if (element && element.focus) {
       element.focus();
       // After focusing, ensure the element is visible
-      element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      const label = document.querySelector(`label[for="${this.props.uniqueFieldId}"]`);
+      if (label) {
+        label.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
     }
   }
 

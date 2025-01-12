@@ -136,11 +136,22 @@ export default class ObjectControl extends React.Component {
   };
 
   focus(path) {
-    const [fieldName, ...remainingPath] = path.split('.');
-    const control = this.childRefs[fieldName];
-    console.log('ObjectControl.focus', fieldName, remainingPath, control);
-    if (control?.focus) {
-      control.focus(remainingPath.join('.'));
+    if (this.state.collapsed) {
+      this.setState({ collapsed: false }, () => {
+        if (path) {
+          const [fieldName, ...remainingPath] = path.split('.');
+          const field = this.childRefs[fieldName];
+          if (field?.focus) {
+            field.focus(remainingPath.join('.'));
+          }
+        }
+      });
+    } else if (path) {
+      const [fieldName, ...remainingPath] = path.split('.');
+      const field = this.childRefs[fieldName];
+      if (field?.focus) {
+        field.focus(remainingPath.join('.'));
+      }
     }
   }
 

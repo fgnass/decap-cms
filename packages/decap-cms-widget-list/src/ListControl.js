@@ -597,11 +597,29 @@ export default class ListControl extends React.Component {
 
   focus(path) {
     const [index, ...remainingPath] = path.split('.');
-    const key = this.state.keys[index];
-    const control = this.childRefs[key];
-    console.log('ListControl.focus', index, key, control);
-    if (control?.focus) {
-      control.focus(remainingPath.join('.'));
+
+    if (this.state.listCollapsed || this.state.itemsCollapsed[index]) {
+      const newItemsCollapsed = [...this.state.itemsCollapsed];
+      newItemsCollapsed[index] = false;
+      this.setState(
+        {
+          listCollapsed: false,
+          itemsCollapsed: newItemsCollapsed,
+        },
+        () => {
+          const key = this.state.keys[index];
+          const control = this.childRefs[key];
+          if (control?.focus) {
+            control.focus(remainingPath.join('.'));
+          }
+        },
+      );
+    } else {
+      const key = this.state.keys[index];
+      const control = this.childRefs[key];
+      if (control?.focus) {
+        control.focus(remainingPath.join('.'));
+      }
     }
   }
 
