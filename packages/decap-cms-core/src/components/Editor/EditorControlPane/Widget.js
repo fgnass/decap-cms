@@ -123,18 +123,15 @@ export default class Widget extends Component {
     // Try widget's custom focus method first
     if (this.innerWrappedControl?.focus) {
       this.innerWrappedControl.focus(path);
-      return;
+    } else {
+      // Fall back to focusing by ID for simple widgets
+      const element = document.getElementById(this.props.uniqueFieldId);
+      element?.focus();
     }
-
-    // Fall back to focusing by ID for simple widgets
-    const element = document.getElementById(this.props.uniqueFieldId);
-    if (element && element.focus) {
-      element.focus();
-      // After focusing, ensure the element is visible
-      const label = document.querySelector(`label[for="${this.props.uniqueFieldId}"]`);
-      if (label) {
-        label.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }
+    // After focusing, ensure the element is visible
+    const label = document.querySelector(`label[for="${this.props.uniqueFieldId}"]`);
+    if (label) {
+      label.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
   }
 
