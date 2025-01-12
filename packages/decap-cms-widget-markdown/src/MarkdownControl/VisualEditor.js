@@ -1,5 +1,5 @@
 // @refresh reset
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { ClassNames, css as coreCss } from '@emotion/react';
@@ -27,6 +27,7 @@ import withShortcodes from './plugins/shortcodes/withShortcodes';
 import insertShortcode from './plugins/shortcodes/insertShortcode';
 import defaultEmptyBlock from './plugins/blocks/defaultEmptyBlock';
 import withHtml from './plugins/html/withHtml';
+import { useFocus } from './hooks';
 
 function visualEditorStyles({ minimal }) {
   return `
@@ -94,6 +95,9 @@ function Editor(props) {
     getEditorComponents,
     getRemarkPlugins,
     onChange,
+    onFocus,
+    onBlur,
+    pendingFocus,
   } = props;
 
   const editor = useMemo(
@@ -132,12 +136,7 @@ function Editor(props) {
   );
   const renderLeaf = useCallback(props => <Leaf {...props} />, []);
 
-  useEffect(() => {
-    if (props.pendingFocus) {
-      ReactEditor.focus(editor);
-      props.pendingFocus();
-    }
-  }, [props.pendingFocus]);
+  useFocus(editor, pendingFocus);
 
   function handleMarkClick(format) {
     ReactEditor.focus(editor);
@@ -268,6 +267,8 @@ function Editor(props) {
                     renderLeaf={renderLeaf}
                     onKeyDown={handleKeyDown}
                     autoFocus={false}
+                    onFocus={onFocus}
+                    onBlur={onBlur}
                   />
                 )}
                 <InsertionPoint onClick={handleClickBelowDocument} />
@@ -292,6 +293,9 @@ Editor.propTypes = {
   getRemarkPlugins: PropTypes.func.isRequired,
   isShowModeToggle: PropTypes.bool.isRequired,
   t: PropTypes.func.isRequired,
+  onFocus: PropTypes.func,
+  onBlur: PropTypes.func,
+  pendingFocus: PropTypes.func,
 };
 
 export default Editor;

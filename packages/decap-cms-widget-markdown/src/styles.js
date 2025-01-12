@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { zIndex } from 'decap-cms-ui-default';
+import { borders, zIndex, colors, lengths } from 'decap-cms-ui-default';
 
 export const editorStyleVars = {
   stickyDistanceBottom: '100px',
@@ -10,4 +10,12 @@ export const EditorControlBar = styled.div`
   position: sticky;
   top: 0;
   margin-bottom: ${editorStyleVars.stickyDistanceBottom};
+  border: ${borders.textField};
+  border-top-right-radius: ${lengths.borderRadius};
+  border-style: solid;
+  border-color: ${colors.textFieldBorder};
+  border-bottom: none;
+  :has(+ :focus-within) {
+    border-color: ${colors.active};
+  }
 `;

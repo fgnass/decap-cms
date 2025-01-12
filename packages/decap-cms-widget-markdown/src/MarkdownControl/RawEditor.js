@@ -1,16 +1,17 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { ClassNames } from '@emotion/react';
 import styled from '@emotion/styled';
-import { lengths, fonts } from 'decap-cms-ui-default';
+import { colors, lengths, fonts } from 'decap-cms-ui-default';
 import { createEditor } from 'slate';
-import { Editable, ReactEditor, Slate, withReact } from 'slate-react';
+import { Editable, Slate, withReact } from 'slate-react';
 import { withHistory } from 'slate-history';
 
 import { editorStyleVars, EditorControlBar } from '../styles';
 import Toolbar from './Toolbar';
 import defaultEmptyBlock from './plugins/blocks/defaultEmptyBlock';
+import { useFocus } from './hooks';
 
 function rawEditorStyles({ minimal }) {
   return `
@@ -23,6 +24,9 @@ function rawEditorStyles({ minimal }) {
   border-top-right-radius: 0;
   border-top: 0;
   margin-top: -${editorStyleVars.stickyDistanceBottom};
+  :focus {
+    border-color: ${colors.active};
+  }
 `;
 }
 
@@ -30,7 +34,7 @@ const RawEditorContainer = styled.div`
   position: relative;
 `;
 function RawEditor(props) {
-  const { className, field, isShowModeToggle, t, onChange } = props;
+  const { className, field, isShowModeToggle, t, onChange, pendingFocus, onFocus, onBlur } = props;
 
   const editor = useMemo(() => withReact(withHistory(createEditor())), []);
 
@@ -40,12 +44,7 @@ function RawEditor(props) {
       : [defaultEmptyBlock()],
   );
 
-  useEffect(() => {
-    if (props.pendingFocus) {
-      ReactEditor.focus(editor);
-      props.pendingFocus();
-    }
-  }, [props.pendingFocus]);
+  useFocus(editor, pendingFocus);
 
   function handleToggleMode() {
     props.onMode('rich_text');
@@ -80,6 +79,8 @@ function RawEditor(props) {
               )}
               value={value}
               onChange={handleChange}
+              onFocus={onFocus}
+              onBlur={onBlur}
             />
           )}
         </ClassNames>
@@ -96,6 +97,9 @@ RawEditor.propTypes = {
   field: ImmutablePropTypes.map.isRequired,
   isShowModeToggle: PropTypes.bool.isRequired,
   t: PropTypes.func.isRequired,
+  onFocus: PropTypes.func,
+  onBlur: PropTypes.func,
+  pendingFocus: PropTypes.func,
 };
 
 export default RawEditor;

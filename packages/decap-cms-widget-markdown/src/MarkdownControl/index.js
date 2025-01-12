@@ -84,13 +84,18 @@ export default class MarkdownControl extends React.Component {
       resolveWidget,
       t,
       isDisabled,
+      setActiveStyle,
+      setInactiveStyle,
     } = this.props;
 
     const { mode, pendingFocus } = this.state;
     const isShowModeToggle = this.getAllowedModes().length > 1;
-    const visualEditor = (
-      <div className="cms-editor-visual" ref={this.processRef}>
-        <VisualEditor
+    const isRichText = mode === 'rich_text';
+    const Editor = isRichText ? VisualEditor : RawEditor;
+
+    return (
+      <div className={isRichText ? 'cms-editor-visual' : 'cms-editor-raw'} ref={this.processRef}>
+        <Editor
           onChange={onChange}
           onAddAsset={onAddAsset}
           isShowModeToggle={isShowModeToggle}
@@ -102,28 +107,13 @@ export default class MarkdownControl extends React.Component {
           getEditorComponents={getEditorComponents}
           getRemarkPlugins={getRemarkPlugins}
           resolveWidget={resolveWidget}
-          pendingFocus={pendingFocus && this.setFocusReceived}
+          onFocus={setActiveStyle}
+          onBlur={setInactiveStyle}
+          pendingFocus={pendingFocus ? this.setFocusReceived : undefined}
           t={t}
           isDisabled={isDisabled}
         />
       </div>
     );
-    const rawEditor = (
-      <div className="cms-editor-raw" ref={this.processRef}>
-        <RawEditor
-          onChange={onChange}
-          onAddAsset={onAddAsset}
-          isShowModeToggle={isShowModeToggle}
-          onMode={this.handleMode}
-          getAsset={getAsset}
-          className={classNameWrapper}
-          value={value}
-          field={field}
-          pendingFocus={pendingFocus && this.setFocusReceived}
-          t={t}
-        />
-      </div>
-    );
-    return mode === 'rich_text' ? visualEditor : rawEditor;
   }
 }
