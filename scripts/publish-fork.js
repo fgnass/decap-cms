@@ -74,10 +74,8 @@ try {
       if (pkgJson[depType]) {
         Object.keys(pkgJson[depType]).forEach(dep => {
           if (dep.startsWith('decap-')) {
-            const newDep = `${NAMESPACE}/${dep}`;
-            // Reference the latest version
-            pkgJson[depType][newDep] = 'latest';
-            delete pkgJson[depType][dep];
+            // Keep original key but point to our namespaced package
+            pkgJson[depType][dep] = `npm:${NAMESPACE}/${dep}@latest`;
           }
         });
       }
