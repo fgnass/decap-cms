@@ -71,9 +71,9 @@ function plugins() {
         },
       ],
       [
-        'transform-assets',
+        'inline-import',
         {
-          extensions: ['css'],
+          extensions: ['.css'],
         },
       ],
     ];
