@@ -1,0 +1,68 @@
+name: Publish Fork
+
+on:
+  push:
+    branches:
+      - fgnass
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run tests
+        run: npm run test:ci
+        
+      - name: Build packages
+        run: npm run build
+        
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: packages/*/dist
+          
+      - name: Upload package.json files
+        uses: actions/upload-artifact@v4
+        with:
+          name: package-json
+          path: packages/*/package.json
+
+  publish:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+      
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: packages
+          
+      - name: Download package.json files
+        uses: actions/download-artifact@v4
+        with:
+          name: package-json
+          path: packages
+      
+      - name: Publish packages
+        run: node scripts/publish-fork.js
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
