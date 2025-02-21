@@ -24,7 +24,10 @@ jobs:
       - name: Run tests
         run: npm run test:ci
         
-      - name: Build and publish packages
+      - name: Build packages
+        run: npm run build
+        
+      - name: Publish packages
         run: node scripts/publish-fork.js
         env:
           # Add NPM_TOKEN as a repository secret in your repository settings
