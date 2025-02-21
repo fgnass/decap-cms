@@ -70,12 +70,6 @@ function plugins() {
           svgo,
         },
       ],
-      [
-        'transform-assets',
-        {
-          extensions: ['css'],
-        },
-      ],
     ];
   }
 
