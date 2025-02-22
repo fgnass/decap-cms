@@ -4,8 +4,8 @@ import u from 'unist-builder';
 import markdownToRemarkPlugin from 'remark-parse';
 import remarkToMarkdownPlugin from 'remark-stringify';
 import remarkToRehype from 'remark-rehype';
-import rehypeToHtml from 'rehype-stringify';
-import htmlToRehype from 'rehype-parse';
+import rehypeToHtml from 'rehype-dom-stringify';
+import htmlToRehype from 'rehype-dom-parse';
 import rehypeToRemark from 'rehype-remark';
 
 import remarkToRehypeShortcodes from './remarkRehypeShortcodes';
