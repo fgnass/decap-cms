@@ -277,13 +277,18 @@ export default function withFileControl({ forImage } = {}) {
       return false;
     }
 
-    componentDidUpdate() {
+    componentDidUpdate(prevProps) {
       const { mediaPaths, value, onRemoveInsertedMedia, onChange } = this.props;
       const mediaPath = mediaPaths.get(this.controlID);
-      if (mediaPath && mediaPath !== value) {
-        onChange(mediaPath);
-      } else if (mediaPath && mediaPath === value) {
-        onRemoveInsertedMedia(this.controlID);
+      const prevMediaPath = prevProps.mediaPaths.get(this.controlID);
+
+      // Only update if the mediaPath has actually changed
+      if (mediaPath !== prevMediaPath) {
+        if (mediaPath && mediaPath !== value) {
+          onChange(mediaPath);
+        } else if (mediaPath && mediaPath === value) {
+          onRemoveInsertedMedia(this.controlID);
+        }
       }
     }
 
