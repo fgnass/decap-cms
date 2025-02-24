@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import styled from '@emotion/styled';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
@@ -98,6 +98,11 @@ function EntryCard({
   viewStyle = VIEW_STYLE_LIST,
   getAsset,
 }) {
+  const imageUrl = useMemo(() => {
+    if (!image) return null;
+    return getAsset(image, imageField).toString();
+  }, [image, imageField, getAsset]);
+
   if (viewStyle === VIEW_STYLE_LIST) {
     return (
       <ListCard>
@@ -117,7 +122,7 @@ function EntryCard({
             {collectionLabel ? <CollectionLabel>{collectionLabel}</CollectionLabel> : null}
             <CardHeading>{summary}</CardHeading>
           </CardBody>
-          {image ? <CardImage src={getAsset(image, imageField).toString()} /> : null}
+          {imageUrl ? <CardImage src={imageUrl} /> : null}
         </GridCardLink>
       </GridCard>
     );
