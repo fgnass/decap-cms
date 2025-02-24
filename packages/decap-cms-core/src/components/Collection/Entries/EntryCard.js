@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
@@ -98,9 +98,13 @@ function EntryCard({
   viewStyle = VIEW_STYLE_LIST,
   getAsset,
 }) {
-  const imageUrl = useMemo(() => {
-    if (!image) return null;
-    return getAsset(image, imageField).toString();
+  const [imageUrl, setImageUrl] = useState(null);
+
+  useEffect(() => {
+    if (image) {
+      const asset = getAsset(image, imageField);
+      setImageUrl(asset.toString());
+    }
   }, [image, imageField, getAsset]);
 
   if (viewStyle === VIEW_STYLE_LIST) {
