@@ -227,6 +227,19 @@ const warnDeprecatedOptions = once(field =>
 `),
 );
 
+function SingleImagePreview({ value, field, getAsset }) {
+  const [src, setSrc] = React.useState(null);
+
+  React.useEffect(() => {
+    if (value) {
+      const asset = getAsset(value, field);
+      setSrc(asset.toString());
+    }
+  }, [value, field, getAsset]);
+
+  return <Image src={src || ''} />;
+}
+
 export default function withFileControl({ forImage } = {}) {
   return class FileControl extends React.Component {
     static propTypes = {
@@ -277,18 +290,13 @@ export default function withFileControl({ forImage } = {}) {
       return false;
     }
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate() {
       const { mediaPaths, value, onRemoveInsertedMedia, onChange } = this.props;
       const mediaPath = mediaPaths.get(this.controlID);
-      const prevMediaPath = prevProps.mediaPaths.get(this.controlID);
-
-      // Only update if the mediaPath has actually changed
-      if (mediaPath !== prevMediaPath) {
-        if (mediaPath && mediaPath !== value) {
-          onChange(mediaPath);
-        } else if (mediaPath && mediaPath === value) {
-          onRemoveInsertedMedia(this.controlID);
-        }
+      if (mediaPath && mediaPath !== value) {
+        onChange(mediaPath);
+      } else if (mediaPath && mediaPath === value) {
+        onRemoveInsertedMedia(this.controlID);
       }
     }
 
@@ -417,6 +425,7 @@ export default function withFileControl({ forImage } = {}) {
     renderImages = () => {
       const { getAsset, value, field } = this.props;
       const items = valueListToSortableArray(value);
+      
       if (isMultiple(value)) {
         return (
           <SortableMultiImageWrapper
@@ -433,10 +442,10 @@ export default function withFileControl({ forImage } = {}) {
         );
       }
 
-      const src = getAsset(value, field);
+      // For single images, we'll use a wrapper component to handle the asset loading
       return (
         <ImageWrapper>
-          <Image src={src || ''} />
+          <SingleImagePreview value={value} field={field} getAsset={getAsset} />
         </ImageWrapper>
       );
     };
