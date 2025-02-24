@@ -233,11 +233,17 @@ function SingleImagePreview({ value, field, getAsset }) {
   React.useEffect(() => {
     if (value) {
       const asset = getAsset(value, field);
-      setSrc(asset.toString());
+      setSrc(asset ? asset.toString() : null);
+    } else {
+      setSrc(null);
     }
   }, [value, field, getAsset]);
 
-  return <Image src={src || ''} />;
+  if (!src) {
+    return null;
+  }
+
+  return <Image src={src} />;
 }
 
 export default function withFileControl({ forImage } = {}) {
