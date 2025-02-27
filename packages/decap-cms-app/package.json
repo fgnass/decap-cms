@@ -19,7 +19,7 @@
       "require": "./dist/decap-cms-app.js"
     },
     "./init": {
-      "import": "./dist/esm/init.js"
+      "import": "./dist/esm/init/index.js"
     }
   },
   "scripts": {
