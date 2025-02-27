@@ -10,6 +10,7 @@ export type { CmsRegistryBackend };
 export type CmsBackendClass = new (...args: any[]) => Implementation;
 
 export type CmsBackendType =
+  | 'aws-cognito-github-proxy'
   | 'azure'
   | 'git-gateway'
   | 'github'
