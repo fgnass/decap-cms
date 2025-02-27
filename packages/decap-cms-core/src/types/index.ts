@@ -448,11 +448,11 @@ export interface EditorComponentOptions {
   type?: string;
   widget?: string;
   fields?: EditorComponentField[];
-  pattern: RegExp;
+  pattern?: RegExp;
   allow_add?: boolean;
-  fromBlock: (match: RegExpMatchArray) => any;
-  toBlock: (data: any) => string;
-  toPreview: (data: any, getAsset: GetAssetFunction, fields: any) => string | JSX.Element;
+  fromBlock?: (match: RegExpMatchArray) => any;
+  toBlock?: (data: any) => string;
+  toPreview?: (data: any, getAsset: GetAssetFunction, fields: any) => string | JSX.Element;
 }
 
 export interface PreviewStyleOptions {
