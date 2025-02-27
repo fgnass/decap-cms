@@ -13,6 +13,15 @@
     "dist/",
     "index.d.ts"
   ],
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/decap-cms-app.js"
+    },
+    "./init": {
+      "import": "./dist/esm/init.js"
+    }
+  },
   "scripts": {
     "develop": "npm run build:esm -- --watch",
     "webpack": "node --max_old_space_size=4096 ../../node_modules/webpack/bin/webpack.js",
