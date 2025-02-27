@@ -3,11 +3,11 @@
 import type { ComponentType, JSX } from 'react';
 import type { List, Map } from 'immutable';
 import type { Pluggable } from 'unified';
-import type { Implementation as CmsBackendClass } from 'decap-cms-lib-util';
+import type { Implementation } from 'decap-cms-lib-util';
 import type { CmsRegistryBackend } from '../backend';
 
 export type { CmsRegistryBackend };
-export type { CmsBackendClass };
+export type CmsBackendClass = new (...args: any[]) => Implementation;
 
 export type CmsBackendType =
   | 'azure'
@@ -480,18 +480,18 @@ export interface CmsWidgetPreviewProps<T = any> {
   fieldsMetaData: Map<string, any>;
 }
 
-export interface CmsWidgetParam<T = any> {
+export interface CmsWidgetParam {
   name: string;
-  controlComponent: ComponentType<CmsWidgetControlProps<T>>;
-  previewComponent?: ComponentType<CmsWidgetPreviewProps<T>>;
+  controlComponent: ComponentType<any>;
+  previewComponent?: ComponentType<any>;
   globalStyles?: any;
   schema?: Record<string, any>;
   allowMapValue?: boolean;
 }
 
 export interface CmsWidget<T = any> {
-  control: ComponentType<CmsWidgetControlProps<T>>;
-  preview?: ComponentType<CmsWidgetPreviewProps<T>>;
+  control: ComponentType<Partial<CmsWidgetControlProps<T>>>;
+  preview?: ComponentType<Partial<CmsWidgetPreviewProps<T>>>;
   globalStyles?: any;
   schema?: Record<string, any>;
   allowMapValue?: boolean;
@@ -609,9 +609,9 @@ export interface CMS {
     component: ComponentType<PreviewTemplateComponentProps>,
   ) => void;
   registerWidget: (
-    widget: string | CmsWidgetParam,
-    control?: ComponentType<CmsWidgetControlProps> | string,
-    preview?: ComponentType<CmsWidgetPreviewProps>,
+    widget: string | CmsWidgetParam | CmsWidgetParam[],
+    control?: ComponentType<Partial<CmsWidgetControlProps>> | string,
+    preview?: ComponentType<Partial<CmsWidgetPreviewProps>>,
   ) => void;
   registerWidgetValueSerializer: (widgetName: string, serializer: CmsWidgetValueSerializer) => void;
   resolveWidget: (name: string) => CmsWidget | undefined;

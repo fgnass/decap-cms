@@ -22,7 +22,8 @@
     "build:types": "tsc"
   },
   "devDependencies": {
-    "cross-env": "^7.0.0"
+    "cross-env": "^7.0.0",
+    "decap-cms-core": "^3.0.0"
   },
   "peerDependencies": {
     "decap-cms-core": "^3.0.0",
