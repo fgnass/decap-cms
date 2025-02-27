@@ -1,5 +1,5 @@
 import { DecapCmsCore as CMS } from 'decap-cms-core';
-import './extensions.js';
+import './extensions';
 
 export * from 'decap-cms-core';
 
