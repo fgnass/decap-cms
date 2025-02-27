@@ -131,12 +131,12 @@ export async function registerAll() {
   ]);
 }
 
-type Options = InitOptions & { setup?: (cms: CMS) => Promise<void> };
+type Options = InitOptions & { setup?: (cms: CMS) => void | Promise<void> };
 
 export async function init(options: Options) {
   const { config, setup } = options;
   await Promise.all([
-    setup,
+    setup && setup(cms),
     registerCoreWidgets(),
     registerLocale(config.locale || 'en'),
     registerBackend(config.local_backend ? 'proxy' : config.backend.name),
