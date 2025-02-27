@@ -1,89 +1,74 @@
 export type * from 'decap-cms-core';
-import { DecapCmsCore as CMS } from 'decap-cms-core';
+import { DecapCmsCore as cms } from 'decap-cms-core';
+
+import type { CMS, CmsBackendType, InitOptions } from 'decap-cms-core';
 export { CMS };
 
 // Backend registration functions
-export async function registerGitGatewayBackend() {
-  const m = await import('decap-cms-backend-git-gateway');
-  console.log('Loaded decap-cms-backend-git-gateway', m);
-  CMS.registerBackend('git-gateway', m.GitGatewayBackend);
-}
-
-export async function registerAzureBackend() {
-  const m = await import('decap-cms-backend-azure');
-  console.log('Loaded decap-cms-backend-azure', m);
-  CMS.registerBackend('azure', m.AzureBackend);
-}
-
-export async function registerAwsCognitoGithubProxyBackend() {
-  const m = await import('decap-cms-backend-aws-cognito-github-proxy');
-  console.log('Loaded decap-cms-backend-aws-cognito-github-proxy', m);
-  CMS.registerBackend('aws-cognito-github-proxy', m.AwsCognitoGitHubProxyBackend);
-}
-
-export async function registerGitHubBackend() {
-  const m = await import('decap-cms-backend-github');
-  console.log('Loaded decap-cms-backend-github', m);
-  CMS.registerBackend('github', m.GitHubBackend);
-}
-
-export async function registerGitLabBackend() {
-  const m = await import('decap-cms-backend-gitlab');
-  console.log('Loaded decap-cms-backend-gitlab', m);
-  CMS.registerBackend('gitlab', m.GitLabBackend);
-}
-
-export async function registerGiteaBackend() {
-  const m = await import('decap-cms-backend-gitea');
-  console.log('Loaded decap-cms-backend-gitea', m);
-  CMS.registerBackend('gitea', m.GiteaBackend);
-}
-
-export async function registerBitbucketBackend() {
-  const m = await import('decap-cms-backend-bitbucket');
-  console.log('Loaded decap-cms-backend-bitbucket', m);
-  CMS.registerBackend('bitbucket', m.BitbucketBackend);
-}
-
-export async function registerTestBackend() {
-  const m = await import('decap-cms-backend-test');
-  console.log('Loaded decap-cms-backend-test', m);
-  CMS.registerBackend('test-repo', m.TestBackend);
-}
-
-export async function registerProxyBackend() {
-  const m = await import('decap-cms-backend-proxy');
-  console.log('Loaded decap-cms-backend-proxy', m);
-  CMS.registerBackend('proxy', m.ProxyBackend);
+export async function registerBackend(type: CmsBackendType) {
+  switch (type) {
+    case 'aws-cognito-github-proxy':
+      cms.registerBackend(
+        type,
+        (await import('decap-cms-backend-aws-cognito-github-proxy')).AwsCognitoGitHubProxyBackend,
+      );
+      break;
+    case 'azure':
+      cms.registerBackend(type, (await import('decap-cms-backend-azure')).AzureBackend);
+      break;
+    case 'bitbucket':
+      cms.registerBackend(type, (await import('decap-cms-backend-bitbucket')).BitbucketBackend);
+      break;
+    case 'git-gateway':
+      cms.registerBackend(type, (await import('decap-cms-backend-git-gateway')).GitGatewayBackend);
+      break;
+    case 'github':
+      cms.registerBackend(type, (await import('decap-cms-backend-github')).GitHubBackend);
+      break;
+    case 'gitlab':
+      cms.registerBackend(type, (await import('decap-cms-backend-gitlab')).GitLabBackend);
+      break;
+    case 'gitea':
+      cms.registerBackend(type, (await import('decap-cms-backend-gitea')).GiteaBackend);
+      break;
+    case 'test-repo':
+      cms.registerBackend(type, (await import('decap-cms-backend-test')).TestBackend);
+      break;
+    case 'proxy':
+      cms.registerBackend(type, (await import('decap-cms-backend-proxy')).ProxyBackend);
+      break;
+    default:
+      throw new Error(`Backend type '${type}' not supported`);
+  }
 }
 
 // Widget registration functions
 export async function registerCoreWidgets() {
   const { widgets } = await import('./core-widgets');
-  CMS.registerWidget(widgets);
+  cms.registerWidget(widgets);
 }
 
 export async function registerMapWidget() {
   const m = await import('decap-cms-widget-map');
-  CMS.registerWidget(m.default.Widget() as any);
+  cms.registerWidget(m.default.Widget() as any);
 }
 
 export async function registerCodeWidget() {
   const m = await import('decap-cms-widget-code');
-  CMS.registerWidget(m.default.Widget() as any);
+  cms.registerWidget(m.default.Widget() as any);
 }
 
 // Editor component registration functions
 export async function registerImageComponent() {
   const m = await import('decap-cms-editor-component-image');
-  CMS.registerEditorComponent(m.default);
+  cms.registerEditorComponent(m.default);
 }
 
 // Locale registration functions
 export async function registerLocale(locale: string) {
   const m = await import('decap-cms-locales');
   if (locale in m) {
-    CMS.registerLocale(locale, m[locale as keyof typeof m]);
+    cms.registerLocale(locale, m[locale as keyof typeof m]);
   } else {
     throw new Error(`Locale ${locale} not found`);
   }
@@ -129,19 +114,32 @@ export const availableLocales = [
 // Convenience function to register everything
 export async function registerAll() {
   await Promise.all([
-    registerGitGatewayBackend(),
-    registerAzureBackend(),
-    registerAwsCognitoGithubProxyBackend(),
-    registerGitHubBackend(),
-    registerGitLabBackend(),
-    registerGiteaBackend(),
-    registerBitbucketBackend(),
-    registerTestBackend(),
-    registerProxyBackend(),
+    registerBackend('git-gateway'),
+    registerBackend('azure'),
+    registerBackend('aws-cognito-github-proxy'),
+    registerBackend('github'),
+    registerBackend('gitlab'),
+    registerBackend('gitea'),
+    registerBackend('bitbucket'),
+    registerBackend('test-repo'),
+    registerBackend('proxy'),
     registerCoreWidgets(),
     registerMapWidget(),
     registerCodeWidget(),
     registerImageComponent(),
     registerLocale('en'), // Register English by default
   ]);
+}
+
+type Options = InitOptions & { setup?: (cms: CMS) => Promise<void> };
+
+export async function init(options: Options) {
+  const { config, setup } = options;
+  await Promise.all([
+    setup,
+    registerCoreWidgets(),
+    registerLocale(config.locale || 'en'),
+    registerBackend(config.local_backend ? 'proxy' : config.backend.name),
+  ]);
+  cms.init(options);
 }
