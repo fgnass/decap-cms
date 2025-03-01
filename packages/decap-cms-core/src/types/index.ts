@@ -464,21 +464,104 @@ export interface PreviewStyle extends PreviewStyleOptions {
   value: string;
 }
 
+export interface QueryHit {
+  data: Record<string, unknown>;
+  path: string;
+  slug: string;
+  i18n?: Record<string, unknown>;
+}
+
 export interface CmsWidgetControlProps<T = any> {
+  // Core props
   value: T;
   field: Map<string, any>;
-  onChange: (value: T) => void;
+  onChange: (value: T, metadata?: Record<string, unknown>) => void;
   forID: string;
   classNameWrapper: string;
+  setActiveStyle: () => void;
+  setInactiveStyle: () => void;
+
+  // Media related props
+  getAsset?: (path: string) => { url: string; path: string };
+  mediaPaths?: Map<string, string>;
+  onAddAsset?: (path: string, file: { url: string; path: string }) => void;
+  onRemoveInsertedMedia?: (path: string) => void;
+  onOpenMediaLibrary?: (options: {
+    allow_multiple?: boolean;
+    config?: Record<string, unknown>;
+  }) => void;
+  onClearMediaControl?: () => void;
+  onRemoveMediaControl?: (path: string) => void;
+  onPersistMedia?: (path: string) => void;
+
+  // Validation related props
+  validate?: (skipWrapped?: Record<string, unknown>) => void;
+  hasError?: boolean;
+
+  // Object and List widget related props
+  onChangeObject?: (value: Record<string, unknown>) => void;
+  onValidateObject?: (value: Record<string, unknown>) => { error: boolean | string };
+  editorControl?: React.ElementType;
+  resolveWidget?: (name: string) => CmsWidget;
+  widget?: CmsWidget;
+  getEditorComponents?: () => {
+    id: string;
+    label: string;
+    icon?: string;
+    fields?: Map<string, any>[];
+  }[];
+  clearFieldErrors?: (path: string) => void;
+  fieldsErrors?: Map<string, any>;
+
+  // Additional props
+  t: (key: string, options?: Record<string, unknown>) => string; // Translation function
+  isDisabled?: boolean;
+  hasActiveStyle?: boolean;
+  classNameWidget?: string;
+  classNameWidgetActive?: string;
+  classNameLabel?: string;
+  classNameLabelActive?: string;
+  locale?: string;
+  controlRef?: (ref: React.RefObject<any>) => void;
+  metadata?: Map<string, unknown>;
+  query?: (
+    id: string,
+    collection: string,
+    searchFields: string[],
+    value: string,
+    file?: string,
+  ) => Promise<{
+    payload: {
+      hits: QueryHit[];
+    };
+  }>;
+  queryHits?: QueryHit[];
+  clearSearch?: () => void;
+  isFetching?: boolean;
+  loadEntry?: (collection: string, slug: string) => Promise<{ payload: Record<string, unknown> }>;
+  isEditorComponent?: boolean;
+  isNewEditorComponent?: boolean;
+  parentIds?: string[];
+  isFieldDuplicate?: (field: Map<string, any>) => boolean;
+  isFieldHidden?: (field: Map<string, any>) => boolean;
+  isParentListCollapsed?: boolean;
+  entry?: Map<string, any>;
+  collection?: Map<string, any>;
+  config?: CmsConfig;
+  getRemarkPlugins?: () => Array<Pluggable>;
 }
 
 export interface CmsWidgetPreviewProps<T = any> {
   value: T;
   field: Map<string, any>;
-  metadata: Map<string, any>;
+  metadata?: Map<string, unknown>;
   getAsset: GetAssetFunction;
   entry: Map<string, any>;
   fieldsMetaData: Map<string, any>;
+  resolveWidget?: (name: string) => CmsWidget;
+  getRemarkPlugins?: () => Array<Pluggable>;
+  collection?: Map<string, any>; // Immutable.Map representation of a CmsCollection object
+  t?: (key: string, options?: Record<string, unknown>) => string;
 }
 
 export interface CmsWidgetParam {
