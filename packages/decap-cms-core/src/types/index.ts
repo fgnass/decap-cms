@@ -660,7 +660,7 @@ export type PreviewTemplateComponentProps = {
   getAsset: GetAssetFunction;
   boundGetAsset: (collection: any, path: any) => GetAssetFunction;
   fieldsMetaData: Map<string, any>;
-  config: Map<string, any>;
+  config: CmsConfig;
   fields: List<Map<string, any>>;
   isLoadingAsset: boolean;
   window: Window;
