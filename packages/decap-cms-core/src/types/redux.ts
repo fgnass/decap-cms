@@ -13,6 +13,7 @@ import type { NotificationsState } from '../reducers/notifications';
 import type { formatExtensions } from '../formats/formats';
 
 export type CmsBackendType =
+  | 'aws-cognito-github-proxy'
   | 'azure'
   | 'git-gateway'
   | 'github'
@@ -42,7 +43,7 @@ export type CmsMarkdownWidgetButton =
 
 export interface CmsSelectWidgetOptionObject {
   label: string;
-  value: unknown;
+  value: unknown; // was any in public types
 }
 
 export type CmsCollectionFormatType =
@@ -57,7 +58,7 @@ export type CmsCollectionFormatType =
 
 export type CmsAuthScope = 'repo' | 'public_repo';
 
-export type CmsPublishMode = 'simple' | 'editorial_workflow';
+export type CmsPublishMode = 'simple' | 'editorial_workflow'; // | ''
 
 export type CmsSlugEncoding = 'unicode' | 'ascii';
 
@@ -86,7 +87,7 @@ export interface CmsFieldBoolean {
 
 export interface CmsFieldCode {
   widget: 'code';
-  default?: unknown;
+  default?: unknown; // was any in public types
 
   default_language?: string;
   allow_language_selection?: boolean;
@@ -131,12 +132,13 @@ export interface CmsFieldFileOrImage {
 
   media_library?: CmsMediaLibrary;
   allow_multiple?: boolean;
-  config?: unknown;
+  choose_url?: boolean; // copied from public type
+  config?: unknown; // was any in public type
 }
 
 export interface CmsFieldObject {
   widget: 'object';
-  default?: unknown;
+  default?: unknown; // was any in public
 
   collapsed?: boolean;
   summary?: string;
@@ -145,7 +147,7 @@ export interface CmsFieldObject {
 
 export interface CmsFieldList {
   widget: 'list';
-  default?: unknown;
+  default?: unknown; // was any in public
 
   allow_add?: boolean;
   collapsed?: boolean;
@@ -241,7 +243,7 @@ export interface CmsFieldRelation {
 
 export interface CmsFieldHidden {
   widget: 'hidden';
-  default?: unknown;
+  default?: unknown; // was any in public type
 }
 
 export interface CmsFieldStringOrText {
@@ -260,24 +262,27 @@ export interface CmsFieldMeta {
   meta: boolean;
 }
 
-export type CmsField = CmsFieldBase &
-  (
-    | CmsFieldBoolean
-    | CmsFieldCode
-    | CmsFieldColor
-    | CmsFieldDateTime
-    | CmsFieldFileOrImage
-    | CmsFieldList
-    | CmsFieldMap
-    | CmsFieldMarkdown
-    | CmsFieldNumber
-    | CmsFieldObject
-    | CmsFieldRelation
-    | CmsFieldSelect
-    | CmsFieldHidden
-    | CmsFieldStringOrText
-    | CmsFieldMeta
-  );
+export type CmsFieldCore =
+  | CmsFieldBoolean
+  | CmsFieldCode
+  | CmsFieldColor
+  | CmsFieldDateTime
+  | CmsFieldFileOrImage
+  | CmsFieldList
+  | CmsFieldMap
+  | CmsFieldMarkdown
+  | CmsFieldNumber
+  | CmsFieldObject
+  | CmsFieldRelation
+  | CmsFieldSelect
+  | CmsFieldHidden
+  | CmsFieldStringOrText;
+
+export type CmsFieldCustom = Record<string, any> & {
+  widget: Exclude<string, CmsFieldCore['widget']>;
+};
+
+export type CmsField = CmsFieldBase & (CmsFieldCore | CmsFieldMeta | CmsFieldCustom);
 
 export interface CmsCollectionFile {
   name: string;
@@ -293,21 +298,19 @@ export interface CmsCollectionFile {
   public_folder?: string;
 }
 
-export interface ViewFilter {
+export type ViewFilter<IsInternal extends boolean = true> = {
   label: string;
   field: string;
   pattern: string;
-  id: string;
-}
+} & (IsInternal extends true ? { id: string } : {});
 
-export interface ViewGroup {
+export type ViewGroup<IsInternal extends boolean = true> = {
   label: string;
   field: string;
   pattern: string;
-  id: string;
-}
+} & (IsInternal extends true ? { id: string } : {});
 
-export interface CmsCollection {
+export type CmsCollection<IsInternal extends boolean = false> = {
   name: string;
   label: string;
   label_singular?: string;
@@ -321,6 +324,7 @@ export interface CmsCollection {
   preview_path_date_field?: string;
   create?: boolean;
   delete?: boolean;
+  hide?: boolean; // copied from public types
   editor?: {
     preview?: boolean;
     visualEditing?: boolean;
@@ -329,7 +333,6 @@ export interface CmsCollection {
   nested?: {
     depth: number;
   };
-  type: typeof FOLDER | typeof FILES;
   meta?: { path?: { label: string; widget: string; index_file: string } };
 
   /**
@@ -342,31 +345,34 @@ export interface CmsCollection {
 
   frontmatter_delimiter?: string[] | string;
   fields?: CmsField[];
-  filter?: { field: string; value: unknown };
+  filter?: { field: string; value: unknown }; // value way any in public type!
   path?: string;
   media_folder?: string;
   public_folder?: string;
   sortable_fields?: string[];
-  view_filters?: ViewFilter[];
-  view_groups?: ViewGroup[];
+  view_filters?: ViewFilter<IsInternal>[];
+  view_groups?: ViewGroup<IsInternal>[];
   i18n?: boolean | CmsI18nConfig;
 
   /**
    * @deprecated Use sortable_fields instead
    */
   sortableFields?: string[];
-}
+} & (IsInternal extends true ? { type: typeof FOLDER | typeof FILES } : {});
 
 export interface CmsBackend {
   name: CmsBackendType;
   auth_scope?: CmsAuthScope;
   open_authoring?: boolean;
+  always_fork?: boolean; // copied from public type
   repo?: string;
   branch?: string;
   api_root?: string;
   site_domain?: string;
   base_url?: string;
   auth_endpoint?: string;
+  app_id?: string; // copied from public type
+  auth_type?: 'implicit' | 'pkce'; // copied from public type
   cms_label_prefix?: string;
   squash_merges?: boolean;
   proxy_url?: string;
@@ -391,9 +397,9 @@ export interface CmsLocalBackend {
   allowed_hosts?: string[];
 }
 
-export interface CmsConfig {
+export type CmsConfig<IsInternal extends boolean = false> = {
   backend: CmsBackend;
-  collections: CmsCollection[];
+  collections: CmsCollection<IsInternal>[];
   locale?: string;
   site_url?: string;
   display_url?: string;
@@ -419,9 +425,12 @@ export interface CmsConfig {
   editor?: {
     preview?: boolean;
   };
-  error: string | undefined;
-  isFetching: boolean;
-}
+} & (IsInternal extends true
+  ? {
+      error: string | undefined;
+      isFetching: boolean;
+    }
+  : {});
 
 export type CmsMediaLibraryOptions = unknown; // TODO: type properly
 
@@ -617,7 +626,7 @@ type CollectionObject = {
   preview_path_date_field?: string;
   summary?: string;
   filter?: FilterRule;
-  type: 'file_based_collection' | 'folder_based_collection';
+  type: typeof FILES | typeof FOLDER;
   extension?: string;
   format?: Format;
   frontmatter_delimiter?: List<string> | string | [string, string];
@@ -690,7 +699,7 @@ export type Cursors = StaticallyTypedRecord<{}>;
 
 export interface State {
   auth: Auth;
-  config: CmsConfig;
+  config: CmsConfig<true>;
   cursors: Cursors;
   collections: Collections;
   deploys: Deploys;

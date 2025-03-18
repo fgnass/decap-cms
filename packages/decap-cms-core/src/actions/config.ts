@@ -205,7 +205,7 @@ export function normalizeConfig(config: CmsConfig) {
 }
 
 export function applyDefaults(originalConfig: CmsConfig) {
-  return produce(originalConfig, config => {
+  return produce(originalConfig, (config: CmsConfig<true>) => {
     config.publish_mode = config.publish_mode || SIMPLE_PUBLISH_MODE;
     config.slug = config.slug || {};
     config.collections = config.collections || [];
