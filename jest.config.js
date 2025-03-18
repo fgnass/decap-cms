@@ -15,6 +15,7 @@ module.exports = {
   transformIgnorePatterns: [
     'node_modules/(?!copy-text-to-clipboard|clean-stack|escape-string-regexp)',
   ],
+  testPathIgnorePatterns: ['/node_modules/', '/dist/'],
   testEnvironment: 'jsdom',
   testEnvironmentOptions: {
     url: 'http://localhost:8080',
