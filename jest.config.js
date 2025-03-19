@@ -8,16 +8,16 @@ module.exports = {
     'decap-cms-lib-widgets': '<rootDir>/packages/decap-cms-lib-widgets/src/index.ts',
     'decap-cms-widget-object': '<rootDir>/packages/decap-cms-widget-object/src/index.ts',
     '\\.(css|less)$': '<rootDir>/__mocks__/styleMock.js',
-    '^#home-directory$': 'clean-stack/home-directory.js',
   },
   modulePathIgnorePatterns: ['.nx', 'dist'],
   snapshotSerializers: ['@emotion/jest/serializer'],
   transformIgnorePatterns: [
-    'node_modules/(?!copy-text-to-clipboard|clean-stack|escape-string-regexp)',
+    'node_modules/(?!copy-text-to-clipboard|clean-stack|escape-string-regexp|uuid)',
   ],
   testPathIgnorePatterns: ['/node_modules/', '/dist/'],
   testEnvironment: 'jsdom',
   testEnvironmentOptions: {
+    customExportConditions: [''],
     url: 'http://localhost:8080',
   },
 };

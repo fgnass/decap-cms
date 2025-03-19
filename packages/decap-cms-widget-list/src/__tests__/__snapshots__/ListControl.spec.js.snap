@@ -218,7 +218,7 @@ exports[`ListControl should add to list when add button is clicked 1`] = `
           classnamewrapper="classNameWrapper"
           collapsed="false"
           data-testid="object-control-0"
-          field="Map { \\"name\\": \\"list\\", \\"label\\": \\"List\\", \\"fields\\": List [ Map { \\"label\\": \\"String\\", \\"name\\": \\"string\\", \\"widget\\": \\"string\\" } ] }"
+          field="Map { "name": "list", "label": "List", "fields": List [ Map { "label": "String", "name": "string", "widget": "string" } ] }"
           fieldserrors="Map {}"
           forlist="true"
           parentids="forID,0"
@@ -466,12 +466,12 @@ exports[`ListControl should remove from list when remove button is clicked 1`] =
           classnamewrapper="classNameWrapper"
           collapsed="false"
           data-testid="object-control-0"
-          field="Map { \\"name\\": \\"list\\", \\"label\\": \\"List\\", \\"collapsed\\": false, \\"minimize_collapsed\\": true, \\"fields\\": List [ Map { \\"label\\": \\"String\\", \\"name\\": \\"string\\", \\"widget\\": \\"string\\" } ] }"
+          field="Map { "name": "list", "label": "List", "collapsed": false, "minimize_collapsed": true, "fields": List [ Map { "label": "String", "name": "string", "widget": "string" } ] }"
           fieldserrors="Map {}"
           forlist="true"
           parentids="forID,0"
           validationkey="0"
-          value="Map { \\"string\\": \\"item 1\\" }"
+          value="Map { "string": "item 1" }"
         />
       </div>
       <div
@@ -496,12 +496,12 @@ exports[`ListControl should remove from list when remove button is clicked 1`] =
           classnamewrapper="classNameWrapper"
           collapsed="false"
           data-testid="object-control-1"
-          field="Map { \\"name\\": \\"list\\", \\"label\\": \\"List\\", \\"collapsed\\": false, \\"minimize_collapsed\\": true, \\"fields\\": List [ Map { \\"label\\": \\"String\\", \\"name\\": \\"string\\", \\"widget\\": \\"string\\" } ] }"
+          field="Map { "name": "list", "label": "List", "collapsed": false, "minimize_collapsed": true, "fields": List [ Map { "label": "String", "name": "string", "widget": "string" } ] }"
           fieldserrors="Map {}"
           forlist="true"
           parentids="forID,1"
           validationkey="1"
-          value="Map { \\"string\\": \\"item 2\\" }"
+          value="Map { "string": "item 2" }"
         />
       </div>
       <div
@@ -744,12 +744,12 @@ exports[`ListControl should remove from list when remove button is clicked 2`] =
           classnamewrapper="classNameWrapper css-1pznrxi"
           collapsed="true"
           data-testid="object-control-1"
-          field="Map { \\"name\\": \\"list\\", \\"label\\": \\"List\\", \\"collapsed\\": false, \\"minimize_collapsed\\": true, \\"fields\\": List [ Map { \\"label\\": \\"String\\", \\"name\\": \\"string\\", \\"widget\\": \\"string\\" } ] }"
+          field="Map { "name": "list", "label": "List", "collapsed": false, "minimize_collapsed": true, "fields": List [ Map { "label": "String", "name": "string", "widget": "string" } ] }"
           fieldserrors="Map {}"
           forlist="true"
           parentids="forID,1"
           validationkey="1"
-          value="Map { \\"string\\": \\"item 2\\" }"
+          value="Map { "string": "item 2" }"
         />
       </div>
       <div
@@ -1003,12 +1003,12 @@ exports[`ListControl should render list with fields with collapse = "false" and 
           classnamewrapper="classNameWrapper"
           collapsed="false"
           data-testid="object-control-0"
-          field="Map { \\"name\\": \\"list\\", \\"label\\": \\"List\\", \\"collapsed\\": false, \\"fields\\": List [ Map { \\"label\\": \\"String\\", \\"name\\": \\"string\\", \\"widget\\": \\"string\\" } ] }"
+          field="Map { "name": "list", "label": "List", "collapsed": false, "fields": List [ Map { "label": "String", "name": "string", "widget": "string" } ] }"
           fieldserrors="Map {}"
           forlist="true"
           parentids="forID,0"
           validationkey="0"
-          value="Map { \\"string\\": \\"item 1\\" }"
+          value="Map { "string": "item 1" }"
         />
       </div>
       <div
@@ -1033,12 +1033,12 @@ exports[`ListControl should render list with fields with collapse = "false" and 
           classnamewrapper="classNameWrapper"
           collapsed="false"
           data-testid="object-control-1"
-          field="Map { \\"name\\": \\"list\\", \\"label\\": \\"List\\", \\"collapsed\\": false, \\"fields\\": List [ Map { \\"label\\": \\"String\\", \\"name\\": \\"string\\", \\"widget\\": \\"string\\" } ] }"
+          field="Map { "name": "list", "label": "List", "collapsed": false, "fields": List [ Map { "label": "String", "name": "string", "widget": "string" } ] }"
           fieldserrors="Map {}"
           forlist="true"
           parentids="forID,1"
           validationkey="1"
-          value="Map { \\"string\\": \\"item 2\\" }"
+          value="Map { "string": "item 2" }"
         />
       </div>
       <div
@@ -1281,12 +1281,12 @@ exports[`ListControl should render list with fields with collapse = "false" and 
           classnamewrapper="classNameWrapper"
           collapsed="false"
           data-testid="object-control-0"
-          field="Map { \\"name\\": \\"list\\", \\"label\\": \\"List\\", \\"collapsed\\": false, \\"minimize_collapsed\\": true, \\"fields\\": List [ Map { \\"label\\": \\"String\\", \\"name\\": \\"string\\", \\"widget\\": \\"string\\" } ] }"
+          field="Map { "name": "list", "label": "List", "collapsed": false, "minimize_collapsed": true, "fields": List [ Map { "label": "String", "name": "string", "widget": "string" } ] }"
           fieldserrors="Map {}"
           forlist="true"
           parentids="forID,0"
           validationkey="0"
-          value="Map { \\"string\\": \\"item 1\\" }"
+          value="Map { "string": "item 1" }"
         />
       </div>
       <div
@@ -1311,12 +1311,12 @@ exports[`ListControl should render list with fields with collapse = "false" and 
           classnamewrapper="classNameWrapper"
           collapsed="false"
           data-testid="object-control-1"
-          field="Map { \\"name\\": \\"list\\", \\"label\\": \\"List\\", \\"collapsed\\": false, \\"minimize_collapsed\\": true, \\"fields\\": List [ Map { \\"label\\": \\"String\\", \\"name\\": \\"string\\", \\"widget\\": \\"string\\" } ] }"
+          field="Map { "name": "list", "label": "List", "collapsed": false, "minimize_collapsed": true, "fields": List [ Map { "label": "String", "name": "string", "widget": "string" } ] }"
           fieldserrors="Map {}"
           forlist="true"
           parentids="forID,1"
           validationkey="1"
-          value="Map { \\"string\\": \\"item 2\\" }"
+          value="Map { "string": "item 2" }"
         />
       </div>
       <div
@@ -1559,12 +1559,12 @@ exports[`ListControl should render list with fields with default collapse ("true
           classnamewrapper="classNameWrapper css-1pznrxi"
           collapsed="true"
           data-testid="object-control-0"
-          field="Map { \\"name\\": \\"list\\", \\"label\\": \\"List\\", \\"fields\\": List [ Map { \\"label\\": \\"String\\", \\"name\\": \\"string\\", \\"widget\\": \\"string\\" } ] }"
+          field="Map { "name": "list", "label": "List", "fields": List [ Map { "label": "String", "name": "string", "widget": "string" } ] }"
           fieldserrors="Map {}"
           forlist="true"
           parentids="forID,0"
           validationkey="0"
-          value="Map { \\"string\\": \\"item 1\\" }"
+          value="Map { "string": "item 1" }"
         />
       </div>
       <div
@@ -1589,12 +1589,12 @@ exports[`ListControl should render list with fields with default collapse ("true
           classnamewrapper="classNameWrapper css-1pznrxi"
           collapsed="true"
           data-testid="object-control-1"
-          field="Map { \\"name\\": \\"list\\", \\"label\\": \\"List\\", \\"fields\\": List [ Map { \\"label\\": \\"String\\", \\"name\\": \\"string\\", \\"widget\\": \\"string\\" } ] }"
+          field="Map { "name": "list", "label": "List", "fields": List [ Map { "label": "String", "name": "string", "widget": "string" } ] }"
           fieldserrors="Map {}"
           forlist="true"
           parentids="forID,1"
           validationkey="1"
-          value="Map { \\"string\\": \\"item 2\\" }"
+          value="Map { "string": "item 2" }"
         />
       </div>
       <div
@@ -2019,12 +2019,12 @@ exports[`ListControl should render list with nested object 1`] = `
           classnamewrapper="classNameWrapper css-1pznrxi"
           collapsed="true"
           data-testid="object-control-0"
-          field="Map { \\"name\\": \\"list\\", \\"label\\": \\"List\\", \\"field\\": Map { \\"name\\": \\"object\\", \\"widget\\": \\"object\\", \\"label\\": \\"Object\\", \\"fields\\": List [ Map { \\"name\\": \\"title\\", \\"widget\\": \\"string\\", \\"label\\": \\"Title\\" } ] } }"
+          field="Map { "name": "list", "label": "List", "field": Map { "name": "object", "widget": "object", "label": "Object", "fields": List [ Map { "name": "title", "widget": "string", "label": "Title" } ] } }"
           fieldserrors="Map {}"
           forlist="true"
           parentids="forID,0"
           validationkey="0"
-          value="Map { \\"object\\": Map { \\"title\\": \\"item 1\\" } }"
+          value="Map { "object": Map { "title": "item 1" } }"
         />
       </div>
       <div
@@ -2049,12 +2049,12 @@ exports[`ListControl should render list with nested object 1`] = `
           classnamewrapper="classNameWrapper css-1pznrxi"
           collapsed="true"
           data-testid="object-control-1"
-          field="Map { \\"name\\": \\"list\\", \\"label\\": \\"List\\", \\"field\\": Map { \\"name\\": \\"object\\", \\"widget\\": \\"object\\", \\"label\\": \\"Object\\", \\"fields\\": List [ Map { \\"name\\": \\"title\\", \\"widget\\": \\"string\\", \\"label\\": \\"Title\\" } ] } }"
+          field="Map { "name": "list", "label": "List", "field": Map { "name": "object", "widget": "object", "label": "Object", "fields": List [ Map { "name": "title", "widget": "string", "label": "Title" } ] } }"
           fieldserrors="Map {}"
           forlist="true"
           parentids="forID,1"
           validationkey="1"
-          value="Map { \\"object\\": Map { \\"title\\": \\"item 2\\" } }"
+          value="Map { "object": Map { "title": "item 2" } }"
         />
       </div>
       <div
@@ -2297,12 +2297,12 @@ exports[`ListControl should render list with nested object with collapse = false
           classnamewrapper="classNameWrapper"
           collapsed="false"
           data-testid="object-control-0"
-          field="Map { \\"name\\": \\"list\\", \\"label\\": \\"List\\", \\"collapsed\\": false, \\"field\\": Map { \\"name\\": \\"object\\", \\"widget\\": \\"object\\", \\"label\\": \\"Object\\", \\"fields\\": List [ Map { \\"name\\": \\"title\\", \\"widget\\": \\"string\\", \\"label\\": \\"Title\\" } ] } }"
+          field="Map { "name": "list", "label": "List", "collapsed": false, "field": Map { "name": "object", "widget": "object", "label": "Object", "fields": List [ Map { "name": "title", "widget": "string", "label": "Title" } ] } }"
           fieldserrors="Map {}"
           forlist="true"
           parentids="forID,0"
           validationkey="0"
-          value="Map { \\"object\\": Map { \\"title\\": \\"item 1\\" } }"
+          value="Map { "object": Map { "title": "item 1" } }"
         />
       </div>
       <div
@@ -2327,12 +2327,12 @@ exports[`ListControl should render list with nested object with collapse = false
           classnamewrapper="classNameWrapper"
           collapsed="false"
           data-testid="object-control-1"
-          field="Map { \\"name\\": \\"list\\", \\"label\\": \\"List\\", \\"collapsed\\": false, \\"field\\": Map { \\"name\\": \\"object\\", \\"widget\\": \\"object\\", \\"label\\": \\"Object\\", \\"fields\\": List [ Map { \\"name\\": \\"title\\", \\"widget\\": \\"string\\", \\"label\\": \\"Title\\" } ] } }"
+          field="Map { "name": "list", "label": "List", "collapsed": false, "field": Map { "name": "object", "widget": "object", "label": "Object", "fields": List [ Map { "name": "title", "widget": "string", "label": "Title" } ] } }"
           fieldserrors="Map {}"
           forlist="true"
           parentids="forID,1"
           validationkey="1"
-          value="Map { \\"object\\": Map { \\"title\\": \\"item 2\\" } }"
+          value="Map { "object": Map { "title": "item 2" } }"
         />
       </div>
       <div
