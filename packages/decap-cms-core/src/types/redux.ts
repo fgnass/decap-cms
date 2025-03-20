@@ -80,12 +80,12 @@ export interface CmsFieldBase {
   comment?: string;
 }
 
-export interface CmsFieldBoolean {
+export interface CmsFieldBoolean extends CmsFieldBase {
   widget: 'boolean';
   default?: boolean;
 }
 
-export interface CmsFieldCode {
+export interface CmsFieldCode extends CmsFieldBase {
   widget: 'code';
   default?: unknown; // was any in public types
 
@@ -95,7 +95,7 @@ export interface CmsFieldCode {
   output_code_only?: boolean;
 }
 
-export interface CmsFieldColor {
+export interface CmsFieldColor extends CmsFieldBase {
   widget: 'color';
   default?: string;
 
@@ -103,7 +103,7 @@ export interface CmsFieldColor {
   enableAlpha?: boolean;
 }
 
-export interface CmsFieldDateTime {
+export interface CmsFieldDateTime extends CmsFieldBase {
   widget: 'datetime';
   default?: string;
 
@@ -126,7 +126,7 @@ export interface CmsFieldDateTime {
   pickerUtc?: boolean;
 }
 
-export interface CmsFieldFileOrImage {
+export interface CmsFieldFileOrImage extends CmsFieldBase {
   widget: 'file' | 'image';
   default?: string;
 
@@ -136,7 +136,7 @@ export interface CmsFieldFileOrImage {
   config?: unknown; // was any in public type
 }
 
-export interface CmsFieldObject {
+export interface CmsFieldObject extends CmsFieldBase {
   widget: 'object';
   default?: unknown; // was any in public
 
@@ -145,7 +145,7 @@ export interface CmsFieldObject {
   fields: CmsField[];
 }
 
-export interface CmsFieldList {
+export interface CmsFieldList extends CmsFieldBase {
   widget: 'list';
   default?: unknown; // was any in public
 
@@ -162,7 +162,7 @@ export interface CmsFieldList {
   types?: (CmsFieldBase & CmsFieldObject)[];
 }
 
-export interface CmsFieldMap {
+export interface CmsFieldMap extends CmsFieldBase {
   widget: 'map';
   default?: string;
 
@@ -170,7 +170,7 @@ export interface CmsFieldMap {
   type?: CmsMapWidgetType;
 }
 
-export interface CmsFieldMarkdown {
+export interface CmsFieldMarkdown extends CmsFieldBase {
   widget: 'markdown';
   default?: string;
 
@@ -185,7 +185,7 @@ export interface CmsFieldMarkdown {
   editorComponents?: string[];
 }
 
-export interface CmsFieldNumber {
+export interface CmsFieldNumber extends CmsFieldBase {
   widget: 'number';
   default?: string | number;
 
@@ -201,7 +201,7 @@ export interface CmsFieldNumber {
   valueType?: 'int' | 'float' | string;
 }
 
-export interface CmsFieldSelect {
+export interface CmsFieldSelect extends CmsFieldBase {
   widget: 'select';
   default?: string | string[];
 
@@ -211,7 +211,7 @@ export interface CmsFieldSelect {
   max?: number;
 }
 
-export interface CmsFieldRelation {
+export interface CmsFieldRelation extends CmsFieldBase {
   widget: 'relation';
   default?: string | string[];
 
@@ -241,54 +241,93 @@ export interface CmsFieldRelation {
   optionsLength?: number;
 }
 
-export interface CmsFieldHidden {
+export interface CmsFieldHidden extends CmsFieldBase {
   widget: 'hidden';
   default?: unknown; // was any in public type
 }
 
-export interface CmsFieldStringOrText {
-  // This is the default widget, so declaring its type is optional.
-  widget?: 'string' | 'text';
+export interface CmsFieldStringBase extends CmsFieldBase {
   default?: string;
   visualEditing?: boolean;
 }
 
-export interface CmsFieldMeta {
-  name: string;
-  label: string;
-  widget: string;
-  required: boolean;
-  index_file: string;
-  meta: boolean;
+export interface CmsFieldString extends CmsFieldStringBase {
+  widget: 'string';
 }
 
-export type CmsFieldCore =
-  | CmsFieldBoolean
-  | CmsFieldCode
-  | CmsFieldColor
-  | CmsFieldDateTime
-  | CmsFieldFileOrImage
-  | CmsFieldList
-  | CmsFieldMap
-  | CmsFieldMarkdown
-  | CmsFieldNumber
-  | CmsFieldObject
-  | CmsFieldRelation
-  | CmsFieldSelect
-  | CmsFieldHidden
-  | CmsFieldStringOrText;
+export interface CmsFieldText extends CmsFieldStringBase {
+  widget: 'text';
+}
 
-export type CmsFieldCustom = Record<string, any> & {
-  widget: Exclude<string, CmsFieldCore['widget']>;
-};
+/**
+ * Interface that can be augmented by custom widgets to add their own properties.
+ */
+export interface CmsFields {
+  boolean: CmsFieldBoolean;
+  code: CmsFieldCode;
+  color: CmsFieldColor;
+  datetime: CmsFieldDateTime;
+  file: CmsFieldFileOrImage;
+  image: CmsFieldFileOrImage;
+  list: CmsFieldList;
+  map: CmsFieldMap;
+  markdown: CmsFieldMarkdown;
+  number: CmsFieldNumber;
+  object: CmsFieldObject;
+  relation: CmsFieldRelation;
+  select: CmsFieldSelect;
+  hidden: CmsFieldHidden;
+  string: CmsFieldString;
+  text: CmsFieldText;
+}
 
-export type CmsField = CmsFieldBase & (CmsFieldCore | CmsFieldMeta | CmsFieldCustom);
+type RegisteredCmsField = {
+  [K in keyof CmsFields]: { widget: K } & CmsFields[K];
+}[keyof CmsFields];
 
-export interface CmsCollectionFile {
+/**
+ * Meta fields are defined outside of the fields[] array but added to it
+ * internally.
+ */
+export type CmsFieldMeta<IsInternal extends boolean = false> = {
+  index_file: string;
+  label?: string;
+  hint?: string;
+  comment?: string;
+} & IsInternal extends true
+  ? {
+      widget: 'string';
+      name: 'path';
+      meta: true;
+      required: true;
+    }
+  : {
+      widget?: 'string';
+      name?: never;
+    };
+
+/**
+ * Fields without a widget prop are treated as string fields.
+ */
+export type CmsFieldDefault<IsInternal extends boolean = true> = CmsFieldStringBase &
+  (IsInternal extends true
+    ? {
+        widget: 'string';
+      }
+    : {
+        widget?: never;
+      });
+
+export type CmsField<IsInternal extends boolean = true> =
+  | RegisteredCmsField
+  | CmsFieldDefault<IsInternal>
+  | CmsFieldMeta<IsInternal>;
+
+export interface CmsCollectionFile<IsInternal extends boolean = true> {
   name: string;
   label: string;
   file: string;
-  fields: CmsField[];
+  fields: CmsField<IsInternal>[];
   label_singular?: string;
   description?: string;
   preview_path?: string;
@@ -310,13 +349,13 @@ export type ViewGroup<IsInternal extends boolean = true> = {
   pattern: string;
 } & (IsInternal extends true ? { id: string } : {});
 
-export type CmsCollection<IsInternal extends boolean = false> = {
+export type CmsCollection<IsInternal extends boolean = true> = {
   name: string;
   label: string;
   label_singular?: string;
   description?: string;
   folder?: string;
-  files?: CmsCollectionFile[];
+  files?: CmsCollectionFile<IsInternal>[];
   identifier_field?: string;
   summary?: string;
   slug?: string;
@@ -333,7 +372,7 @@ export type CmsCollection<IsInternal extends boolean = false> = {
   nested?: {
     depth: number;
   };
-  meta?: { path?: { label: string; widget: string; index_file: string } };
+  meta?: { path?: CmsFieldMeta<IsInternal> };
 
   /**
    * It accepts the following values: yml, yaml, toml, json, md, markdown, html
@@ -344,7 +383,7 @@ export type CmsCollection<IsInternal extends boolean = false> = {
   format?: CmsCollectionFormatType;
 
   frontmatter_delimiter?: string[] | string;
-  fields?: CmsField[];
+  fields?: CmsField<IsInternal>[];
   filter?: { field: string; value: unknown }; // value way any in public type!
   path?: string;
   media_folder?: string;
@@ -397,7 +436,7 @@ export interface CmsLocalBackend {
   allowed_hosts?: string[];
 }
 
-export type CmsConfig<IsInternal extends boolean = false> = {
+export type CmsConfig<IsInternal extends boolean = true> = {
   backend: CmsBackend;
   collections: CmsCollection<IsInternal>[];
   locale?: string;
@@ -699,7 +738,7 @@ export type Cursors = StaticallyTypedRecord<{}>;
 
 export interface State {
   auth: Auth;
-  config: CmsConfig<true>;
+  config: CmsConfig;
   cursors: Cursors;
   collections: Collections;
   deploys: Deploys;

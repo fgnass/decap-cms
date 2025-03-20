@@ -132,7 +132,7 @@ function getI18nDefaults(
   }
 }
 
-function setI18nDefaultsForFields(collectionOrFileFields: CmsField[], hasI18n: boolean) {
+function setI18nDefaultsForFields(collectionOrFileFields: CmsField<true>[], hasI18n: boolean) {
   if (hasI18n) {
     return traverseFieldsJS(collectionOrFileFields, setI18nField);
   } else {
@@ -205,7 +205,7 @@ export function normalizeConfig(config: CmsConfig) {
 }
 
 export function applyDefaults(originalConfig: CmsConfig) {
-  return produce(originalConfig, (config: CmsConfig<true>) => {
+  return produce(originalConfig, (config: CmsConfig) => {
     config.publish_mode = config.publish_mode || SIMPLE_PUBLISH_MODE;
     config.slug = config.slug || {};
     config.collections = config.collections || [];
