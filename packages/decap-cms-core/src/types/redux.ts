@@ -371,6 +371,7 @@ export type CmsCollection<IsInternal extends boolean = true> = {
   publish?: boolean;
   nested?: {
     depth: number;
+    subfolders?: boolean;
   };
   meta?: { path?: CmsFieldMeta<IsInternal> };
 
