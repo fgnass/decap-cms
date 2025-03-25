@@ -228,7 +228,7 @@ export class PreviewPane extends React.Component {
 
     if (typeof slugToLoad === 'undefined') {
       const entries = await getAllEntries(state, selectedCollection);
-      
+
       return entries.map(({ data, slug, path }) => Map({ data, slug, path }));
     }
 
