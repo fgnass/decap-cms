@@ -294,7 +294,7 @@ export type CmsFieldMeta<IsInternal extends boolean = false> = {
   label?: string;
   hint?: string;
   comment?: string;
-} & IsInternal extends true
+} & (IsInternal extends true
   ? {
       widget: 'string';
       name: 'path';
@@ -304,7 +304,7 @@ export type CmsFieldMeta<IsInternal extends boolean = false> = {
   : {
       widget?: 'string';
       name?: never;
-    };
+    });
 
 /**
  * Fields without a widget prop are treated as string fields.
