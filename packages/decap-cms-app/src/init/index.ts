@@ -1,70 +1,133 @@
 export type * from 'decap-cms-core';
 import { DecapCmsCore as cms } from 'decap-cms-core';
 
-import type { CMS, CmsBackendType, InitOptions } from 'decap-cms-core';
+import type { CMS, CmsBackendType, CmsConfig, CmsField, InitOptions } from 'decap-cms-core';
 export { CMS };
 
-// Backend registration functions
-export async function registerBackend(type: CmsBackendType) {
-  switch (type) {
-    case 'aws-cognito-github-proxy':
-      cms.registerBackend(
-        type,
-        (await import('decap-cms-backend-aws-cognito-github-proxy')).AwsCognitoGitHubProxyBackend,
-      );
-      break;
-    case 'azure':
-      cms.registerBackend(type, (await import('decap-cms-backend-azure')).AzureBackend);
-      break;
-    case 'bitbucket':
-      cms.registerBackend(type, (await import('decap-cms-backend-bitbucket')).BitbucketBackend);
-      break;
-    case 'git-gateway':
-      cms.registerBackend(type, (await import('decap-cms-backend-git-gateway')).GitGatewayBackend);
-      break;
-    case 'github':
-      cms.registerBackend(type, (await import('decap-cms-backend-github')).GitHubBackend);
-      break;
-    case 'gitlab':
-      cms.registerBackend(type, (await import('decap-cms-backend-gitlab')).GitLabBackend);
-      break;
-    case 'gitea':
-      cms.registerBackend(type, (await import('decap-cms-backend-gitea')).GiteaBackend);
-      break;
-    case 'test-repo':
-      cms.registerBackend(type, (await import('decap-cms-backend-test')).TestBackend);
-      break;
-    case 'proxy':
-      cms.registerBackend(type, (await import('decap-cms-backend-proxy')).ProxyBackend);
-      break;
-    default:
-      throw new Error(`Backend type '${type}' not supported`);
+// List of known backends, will be auto-loaded based on config
+const backends = {
+  'aws-cognito-github-proxy': async () =>
+    (await import('decap-cms-backend-aws-cognito-github-proxy')).AwsCognitoGitHubProxyBackend,
+  azure: async () => (await import('decap-cms-backend-azure')).AzureBackend,
+  bitbucket: async () => (await import('decap-cms-backend-bitbucket')).BitbucketBackend,
+  'git-gateway': async () => (await import('decap-cms-backend-git-gateway')).GitGatewayBackend,
+  github: async () => (await import('decap-cms-backend-github')).GitHubBackend,
+  gitlab: async () => (await import('decap-cms-backend-gitlab')).GitLabBackend,
+  gitea: async () => (await import('decap-cms-backend-gitea')).GiteaBackend,
+  'test-repo': async () => (await import('decap-cms-backend-test')).TestBackend,
+  proxy: async () => (await import('decap-cms-backend-proxy')).ProxyBackend,
+};
+
+async function registerBackend(type: CmsBackendType) {
+  const loader = backends[type];
+  if (!loader) {
+    throw new Error(`Backend type '${type}' not supported`);
+  }
+  cms.registerBackend(type, await loader());
+}
+
+// List of known widgets, will be auto-loaded based on config
+const widgets = {
+  map: async () => (await import('decap-cms-widget-map')).default.Widget(),
+  code: async () => (await import('decap-cms-widget-code')).default.Widget(),
+  string: async () => (await import('decap-cms-widget-string')).default.Widget(),
+  number: async () => (await import('decap-cms-widget-number')).default.Widget(),
+  text: async () => (await import('decap-cms-widget-text')).default.Widget(),
+  image: async () => (await import('decap-cms-widget-image')).default.Widget(),
+  file: async () => (await import('decap-cms-widget-file')).default.Widget(),
+  select: async () => (await import('decap-cms-widget-select')).default.Widget(),
+  markdown: async () => (await import('decap-cms-widget-markdown')).default.Widget(),
+  list: async () => (await import('decap-cms-widget-list')).default.Widget(),
+  object: async () => (await import('decap-cms-widget-object')).default.Widget(),
+  relation: async () => (await import('decap-cms-widget-relation')).default.Widget(),
+  boolean: async () => (await import('decap-cms-widget-boolean')).default.Widget(),
+  datetime: async () => (await import('decap-cms-widget-datetime')).default.Widget(),
+  color: async () => (await import('decap-cms-widget-colorstring')).default.Widget(),
+};
+
+// List of known editor components, will be auto-loaded based on config
+const editorComponents = {
+  image: async () => (await import('decap-cms-editor-component-image')).default,
+  'code-block': () => ({
+    id: 'code-block',
+    label: 'Code Block',
+    widget: 'code',
+    type: 'code-block',
+  }),
+};
+
+function registerWidgetsAndEditorComponents(config: CmsConfig) {
+  const usedWidgets = new Set<string>();
+  const usedEditorComponents = new Set<string>();
+
+  // Collect widgets and editor components used in collection fields
+  for (const c of config.collections) {
+    if (c.files) {
+      for (const file of c.files) {
+        if (file.fields) collectWidgets(file.fields, usedWidgets, usedEditorComponents);
+      }
+    }
+    if (c.fields) collectWidgets(c.fields, usedWidgets, usedEditorComponents);
+  }
+
+  // Load and register all used editor components
+  usedEditorComponents.values().map(async type => {
+    const loader = editorComponents[type as keyof typeof editorComponents];
+    if (loader) {
+      // Don't override manually registered components...
+      if (!cms.getEditorComponents().has(type)) {
+        cms.registerEditorComponent(await loader());
+      }
+    } else {
+      // Check if the component has been manually registered...
+      if (!cms.getEditorComponents().has(type)) {
+        throw new Error(
+          `Unknown editor component "${type}". If this is a custom component, make sure to register it.`,
+        );
+      }
+    }
+  });
+
+  // Collect widgets from editor components (like the "code" widget from the code-block)
+  cms
+    .getEditorComponents()
+    .valueSeq()
+    .forEach(e => {
+      if (e?.widget) usedWidgets.add(e.widget);
+    });
+
+  // Load and register all used widgets
+  return Promise.all(
+    usedWidgets.values().map(async type => {
+      const loader = widgets[type as keyof typeof widgets];
+      if (loader) {
+        cms.registerWidget(await loader());
+      } else {
+        if (!cms.getWidget(type)) {
+          throw new Error(
+            `Unknown widget type "${type}". If this is a custom widget, make sure to register it.`,
+          );
+        }
+      }
+    }),
+  );
+}
+
+function collectWidgets(fields: CmsField[], widgets: Set<string>, editorComponents: Set<string>) {
+  for (const f of fields) {
+    widgets.add(f.widget);
+    if (f.widget === 'list') {
+      collectWidgets(f.field ? [f.field] : f.fields ?? [], widgets, editorComponents);
+    }
+    if (f.widget === 'object') {
+      collectWidgets(f.fields, widgets, editorComponents);
+    }
+    if (f.widget === 'markdown' && f.editor_components) {
+      f.editor_components.forEach(c => editorComponents.add(c));
+    }
   }
 }
 
-// Widget registration functions
-export async function registerCoreWidgets() {
-  const { widgets } = await import('./core-widgets');
-  cms.registerWidget(widgets);
-}
-
-export async function registerMapWidget() {
-  const m = await import('decap-cms-widget-map');
-  cms.registerWidget(m.default.Widget() as any);
-}
-
-export async function registerCodeWidget() {
-  const m = await import('decap-cms-widget-code');
-  cms.registerWidget(m.default.Widget() as any);
-}
-
-// Editor component registration functions
-export async function registerImageComponent() {
-  const m = await import('decap-cms-editor-component-image');
-  cms.registerEditorComponent(m.default);
-}
-
-// Locale registration functions
 export async function registerLocale(locale: string) {
   const m = await import('decap-cms-locales');
   if (locale in m) {
@@ -111,33 +174,13 @@ export const availableLocales = [
   'zh_Hant', // Traditional Chinese
 ] as const;
 
-// Convenience function to register everything
-export async function registerAll() {
-  await Promise.all([
-    registerBackend('git-gateway'),
-    registerBackend('azure'),
-    registerBackend('aws-cognito-github-proxy'),
-    registerBackend('github'),
-    registerBackend('gitlab'),
-    registerBackend('gitea'),
-    registerBackend('bitbucket'),
-    registerBackend('test-repo'),
-    registerBackend('proxy'),
-    registerCoreWidgets(),
-    registerMapWidget(),
-    registerCodeWidget(),
-    registerImageComponent(),
-    registerLocale('en'), // Register English by default
-  ]);
-}
-
 type Options = InitOptions & { setup?: (cms: CMS) => void | Promise<void> };
 
 export async function init(options: Options) {
   const { config, setup } = options;
   await Promise.all([
     setup && setup(cms),
-    registerCoreWidgets(),
+    registerWidgetsAndEditorComponents(config),
     registerLocale(config.locale || 'en'),
     registerBackend(config.local_backend ? 'proxy' : config.backend.name),
   ]);
