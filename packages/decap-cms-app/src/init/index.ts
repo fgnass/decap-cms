@@ -103,7 +103,7 @@ function registerWidgetsAndEditorComponents(config: CmsConfig) {
       if (loader) {
         cms.registerWidget(await loader());
       } else {
-        if (!cms.getWidget(type)) {
+        if (!cms.getWidget(type) && type !== 'hidden') {
           throw new Error(
             `Unknown widget type "${type}". If this is a custom widget, make sure to register it.`,
           );
