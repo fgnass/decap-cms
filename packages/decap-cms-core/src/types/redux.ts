@@ -289,7 +289,7 @@ type RegisteredCmsField = {
  * Meta fields are defined outside of the fields[] array but added to it
  * internally.
  */
-export type CmsFieldMeta<IsInternal extends boolean = false> = {
+export type CmsFieldMeta<IsInternal extends boolean = boolean> = {
   index_file: string;
   label?: string;
   hint?: string;
@@ -309,7 +309,7 @@ export type CmsFieldMeta<IsInternal extends boolean = false> = {
 /**
  * Fields without a widget prop are treated as string fields.
  */
-export type CmsFieldDefault<IsInternal extends boolean = true> = CmsFieldStringBase &
+export type CmsFieldDefault<IsInternal extends boolean = boolean> = CmsFieldStringBase &
   (IsInternal extends true
     ? {
         widget: 'string';
@@ -318,12 +318,12 @@ export type CmsFieldDefault<IsInternal extends boolean = true> = CmsFieldStringB
         widget?: never;
       });
 
-export type CmsField<IsInternal extends boolean = true> =
+export type CmsField<IsInternal extends boolean = boolean> =
   | RegisteredCmsField
   | CmsFieldDefault<IsInternal>
   | CmsFieldMeta<IsInternal>;
 
-export interface CmsCollectionFile<IsInternal extends boolean = true> {
+export interface CmsCollectionFile<IsInternal extends boolean = boolean> {
   name: string;
   label: string;
   file: string;
@@ -337,19 +337,19 @@ export interface CmsCollectionFile<IsInternal extends boolean = true> {
   public_folder?: string;
 }
 
-export type ViewFilter<IsInternal extends boolean = true> = {
+export type ViewFilter<IsInternal extends boolean = boolean> = {
   label: string;
   field: string;
   pattern: string;
 } & (IsInternal extends true ? { id: string } : {});
 
-export type ViewGroup<IsInternal extends boolean = true> = {
+export type ViewGroup<IsInternal extends boolean = boolean> = {
   label: string;
   field: string;
   pattern: string;
 } & (IsInternal extends true ? { id: string } : {});
 
-export type CmsCollection<IsInternal extends boolean = true> = {
+export type CmsCollection<IsInternal extends boolean = boolean> = {
   name: string;
   label: string;
   label_singular?: string;
@@ -437,7 +437,7 @@ export interface CmsLocalBackend {
   allowed_hosts?: string[];
 }
 
-export type CmsConfig<IsInternal extends boolean = true> = {
+export type CmsConfig<IsInternal extends boolean = boolean> = {
   backend: CmsBackend;
   collections: CmsCollection<IsInternal>[];
   locale?: string;
@@ -541,9 +541,9 @@ export type SortMap = OrderedMap<string, StaticallyTypedRecord<SortObject>>;
 
 export type Sort = Map<string, SortMap>;
 
-export type FilterMap = StaticallyTypedRecord<ViewFilter & { active: boolean }>;
+export type FilterMap = StaticallyTypedRecord<ViewFilter<true> & { active: boolean }>;
 
-export type GroupMap = StaticallyTypedRecord<ViewGroup & { active: boolean }>;
+export type GroupMap = StaticallyTypedRecord<ViewGroup<true> & { active: boolean }>;
 
 export type Filter = Map<string, Map<string, FilterMap>>; // collection.field.active
 
@@ -800,23 +800,23 @@ export interface EntriesSortFailurePayload extends EntriesSortRequestPayload {
 }
 
 export interface EntriesFilterRequestPayload {
-  filter: ViewFilter;
+  filter: ViewFilter<true>;
   collection: string;
 }
 
 export interface EntriesFilterFailurePayload {
-  filter: ViewFilter;
+  filter: ViewFilter<true>;
   collection: string;
   error: Error;
 }
 
 export interface EntriesGroupRequestPayload {
-  group: ViewGroup;
+  group: ViewGroup<true>;
   collection: string;
 }
 
 export interface EntriesGroupFailurePayload {
-  group: ViewGroup;
+  group: ViewGroup<true>;
   collection: string;
   error: Error;
 }

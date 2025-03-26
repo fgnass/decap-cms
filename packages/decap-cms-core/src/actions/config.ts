@@ -169,7 +169,7 @@ function hasIntegration(config: CmsConfig, collection: CmsCollection) {
   return !!integration;
 }
 
-export function normalizeConfig(config: CmsConfig) {
+export function normalizeConfig(config: CmsConfig<false>) {
   const { collections = [] } = config;
 
   const normalizedCollections = collections.map(collection => {
@@ -204,8 +204,8 @@ export function normalizeConfig(config: CmsConfig) {
   return { ...config, collections: normalizedCollections };
 }
 
-export function applyDefaults(originalConfig: CmsConfig) {
-  return produce(originalConfig, (config: CmsConfig) => {
+export function applyDefaults(originalConfig: CmsConfig<false>) {
+  return produce(originalConfig, (config: CmsConfig<true>) => {
     config.publish_mode = config.publish_mode || SIMPLE_PUBLISH_MODE;
     config.slug = config.slug || {};
     config.collections = config.collections || [];
@@ -375,10 +375,13 @@ export function parseConfig(data: string) {
       config[key] = config[window.CMS_ENV][key] as CmsConfig[keyof CmsConfig];
     }
   }
-  return config as Partial<CmsConfig>;
+  return config as Partial<CmsConfig<false>>;
 }
 
-async function getConfigYaml(file: string, hasManualConfig: boolean) {
+async function getConfigYaml(
+  file: string,
+  hasManualConfig: boolean,
+): Promise<Partial<CmsConfig<false>>> {
   const response = await fetch(file, { credentials: 'same-origin' }).catch(error => error as Error);
   if (response instanceof Error || response.status !== 200) {
     if (hasManualConfig) {
@@ -473,7 +476,7 @@ function getPublishMode(config: CmsConfig, publishModes?: CmsPublishMode[], back
   return config.publish_mode;
 }
 
-export async function handleLocalBackend(originalConfig: CmsConfig) {
+export async function handleLocalBackend(originalConfig: CmsConfig<false>) {
   if (!originalConfig.local_backend) {
     return originalConfig;
   }
@@ -498,7 +501,7 @@ export async function handleLocalBackend(originalConfig: CmsConfig) {
   });
 }
 
-export function loadConfig(manualConfig: Partial<CmsConfig> = {}, onLoad: () => unknown) {
+export function loadConfig(manualConfig: Partial<CmsConfig<false>> = {}, onLoad: () => unknown) {
   if (window.CMS_CONFIG) {
     return configLoaded(window.CMS_CONFIG);
   }

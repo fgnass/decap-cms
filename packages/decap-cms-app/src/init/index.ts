@@ -115,7 +115,9 @@ function registerWidgetsAndEditorComponents(config: CmsConfig) {
 
 function collectWidgets(fields: CmsField[], widgets: Set<string>, editorComponents: Set<string>) {
   for (const f of fields) {
-    widgets.add(f.widget);
+    if (f.widget) {
+      widgets.add(f.widget);
+    }
     if (f.widget === 'list') {
       collectWidgets(f.field ? [f.field] : f.fields ?? [], widgets, editorComponents);
     }
