@@ -56,7 +56,7 @@ const editorComponents = {
   }),
 };
 
-function registerWidgetsAndEditorComponents(config: CmsConfig) {
+async function registerWidgetsAndEditorComponents(config: CmsConfig) {
   const usedWidgets = new Set<string>();
   const usedEditorComponents = new Set<string>();
 
@@ -71,22 +71,24 @@ function registerWidgetsAndEditorComponents(config: CmsConfig) {
   }
 
   // Load and register all used editor components
-  usedEditorComponents.values().map(async type => {
-    const loader = editorComponents[type as keyof typeof editorComponents];
-    if (loader) {
-      // Don't override manually registered components...
-      if (!cms.getEditorComponents().has(type)) {
-        cms.registerEditorComponent(await loader());
+  await Promise.all(
+    [...usedEditorComponents].map(async type => {
+      const loader = editorComponents[type as keyof typeof editorComponents];
+      if (loader) {
+        // Don't override manually registered components...
+        if (!cms.getEditorComponents().has(type)) {
+          cms.registerEditorComponent(await loader());
+        }
+      } else {
+        // Check if the component has been manually registered...
+        if (!cms.getEditorComponents().has(type)) {
+          throw new Error(
+            `Unknown editor component "${type}". If this is a custom component, make sure to register it.`,
+          );
+        }
       }
-    } else {
-      // Check if the component has been manually registered...
-      if (!cms.getEditorComponents().has(type)) {
-        throw new Error(
-          `Unknown editor component "${type}". If this is a custom component, make sure to register it.`,
-        );
-      }
-    }
-  });
+    }),
+  );
 
   // Collect widgets from editor components (like the "code" widget from the code-block)
   cms
