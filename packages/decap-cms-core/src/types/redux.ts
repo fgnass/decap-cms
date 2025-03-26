@@ -318,10 +318,10 @@ export type CmsFieldDefault<IsInternal extends boolean = boolean> = CmsFieldStri
         widget?: never;
       });
 
-export type CmsField<IsInternal extends boolean = boolean> =
-  | RegisteredCmsField
-  | CmsFieldDefault<IsInternal>
-  | CmsFieldMeta<IsInternal>;
+// Meta fields are only included in the internal interface (after initial processing)
+export type CmsField<IsInternal extends boolean = boolean> = IsInternal extends true
+  ? RegisteredCmsField | CmsFieldDefault<true> | CmsFieldMeta<true>
+  : RegisteredCmsField | CmsFieldDefault<false>;
 
 export interface CmsCollectionFile<IsInternal extends boolean = boolean> {
   name: string;
