@@ -23,6 +23,7 @@ class PreviewContent extends React.Component {
       const decoded = vercelStegaDecode(text);
       if (decoded?.decap) {
         if (onFieldClick) {
+          e.preventDefault();
           onFieldClick(decoded.decap);
         }
       }
